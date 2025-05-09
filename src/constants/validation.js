@@ -1,0 +1,9 @@
+export const LENGTH_LIMITS = {
+    USERNAME_MIN: 3,
+    USERNAME_MAX: 24,
+    PASSWORD_MIN: 8,
+    PASSWORD_MAX: 32,
+}
+
+export const PASSWORD_REGEX_STR = `^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{${LENGTH_LIMITS.PASSWORD_MIN},${LENGTH_LIMITS.PASSWORD_MAX}}$`;
+export const USER_REGEX_STR = `^[A-z0-9-_]{${LENGTH_LIMITS.USERNAME_MIN},${LENGTH_LIMITS.USERNAME_MAX}}$`;
