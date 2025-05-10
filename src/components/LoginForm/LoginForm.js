@@ -1,11 +1,17 @@
-import { useRef, useState, useEffect, useContext } from 'react';
-import AuthContext from '../../context/AuthProvider';
-import ErrorMessage from '../RegisterForm/ErrorMessage';
+import { useRef, useState, useEffect } from 'react';
+import ErrorMessage from '../messages/ErrorMessage';
+import useAuth from '../../hooks/useAuth';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from '../../api/axios';
 import './LoginForm.css';
 
 const LoginForm = () => {
-  const { setAuth } = useContext(AuthContext);
+  const { setAuth } = useAuth();
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/home';
+
   const userRef = useRef();
   const errRef = useRef();
 
@@ -41,6 +47,7 @@ const LoginForm = () => {
       setAuth({ user, uid, avatarFilename, roles, accessToken });
       setUser('');
       setPassword('')
+      navigate(from, { replace: true }); 
     } catch (err){
       if(!err?.response){
         setErrorMessage('Nie można połączyć się z serwerem.');
@@ -85,9 +92,11 @@ const LoginForm = () => {
 
         <button className='login-form-btn'>Zaloguj się</button>
       </form>
+      <Link to='/' className='login-form-link'>Nie pamiętasz hasła?</Link>
+      <hr />
       <p className='login-form-signup'>
-        Potrzebujesz konta?<br/>
-        <a href='#'>Zarejestruj się</a>
+        Nie masz konta?<br/>
+        <Link to='/register' className='login-form-link'>Zarejestruj się</Link>
       </p>
     </section>
   )

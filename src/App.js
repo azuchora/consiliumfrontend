@@ -1,13 +1,31 @@
 import RegisterForm from './components/RegisterForm/RegisterForm';
 import LoginForm from './components/LoginForm/LoginForm';
+import { Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout/Layout';
+import Unauthorized from './components/messages/Unauthorized';
+import Missing from './components/messages/Missing';
+import RequireAuth from './components/RequireAuth/RequireAuth';
+import { Testowy } from './components/Testowy';
+import { ROLES } from './constants/roles';
 import "./App.css";
 
 function App() {
   return (
-    <main className="App">
-      {/* <RegisterForm/> */}
-      <LoginForm/>
-    </main>
+    <Routes>
+      <Route path='/' element={<Layout />}>
+        {/* Public */}
+        <Route path='login' element={<LoginForm />} />
+        <Route path='register' element={<RegisterForm />} />   
+        <Route path='unauthorized' element={<Unauthorized />} />
+
+        <Route path='*' element={<Missing />} />
+
+        {/* Private (role + auth based)  */}
+        <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
+          <Route path='home' element={<Testowy />} />
+        </Route>
+      </Route>
+    </Routes>
   );
 }
 

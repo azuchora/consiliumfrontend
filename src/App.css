@@ -20,10 +20,25 @@ body {
 .App {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   min-height: 100vh; 
   padding: 1rem 0.5rem;
+}
+
+nav {
+    width: 100%;
+    display: flex;
+    background-color: gray;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+footer {
+  margin-top: auto;
+  width: 100%;
+  text-align: center;
+  padding: 0.25rem;
 }
 
 .instructions {

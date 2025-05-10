@@ -4,7 +4,7 @@ import { isEmail } from 'validator';
 import TextInput from './TextInput';
 import PasswordInput from './PasswordInput';
 import SuccessMessage from './SuccessMessage';
-import ErrorMessage from './ErrorMessage';
+import ErrorMessage from '../messages/ErrorMessage';
 import './RegisterForm.css';
 import axios from '../../api/axios';
 
