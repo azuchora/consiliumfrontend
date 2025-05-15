@@ -28,7 +28,7 @@ The application serves as a **closed discussion forum** for doctors, supporting 
 
 ## 🚀 How to run the frontend locally
 
-> ⚠️ **Important**
+> ⚠️
 > The application requires a running backend (API). Backend repository: [consiliumbackend](https://github.com/Rzanklod/consiliumbackend)
 > 🐳 Docker support coming soon™
 
