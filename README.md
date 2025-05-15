@@ -1,70 +1,58 @@
-# Getting Started with Create React App
+# 🩺 CONSILIUM – Discussion Forum for Doctors (Frontend)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[![🇵🇱](https://flagcdn.com/w20/pl.png) Czytaj po polsku](README.pl.md)
 
-## Available Scripts
+## 📌 Description
 
-In the project directory, you can run:
+The **CONSILIUM** project was developed as part of my bachelor’s thesis in Computer Science. The goal was to create a real web application that supports medical professionals in the consultation process, while also developing skills in **React**, **REST API**, UX, and frontend-backend system design.
 
-### `npm start`
+## Purpose of the application
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The application serves as a **closed discussion forum** for doctors, supporting the diagnostic process by enabling the exchange of knowledge, experiences, and joint analysis of clinical cases.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## ⚙️ Technologies
 
-### `npm test`
+- **React.js** – main framework for building the user interface
+- **React Router** – handling multiple views in a SPA
+- **Axios** – ommunication with the backend REST API 
+- **Context API** – global application state (authorization, user)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## ✨ Main features (frontend)
 
-### `npm run build`
+- Login / registration / verification of doctors
+- Browsing and filtering discussion threads
+- Creating new topics and adding comments (and replies to comments)
+- Responsive interface adapted to various devices
+- Private discussions between doctors
+- Session management and token-based authorization
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🚀 How to run the frontend locally
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+> ⚠️ **Important**
+> The application requires a running backend (API). Backend repository: [consiliumbackend](https://github.com/Rzanklod/consiliumbackend)
+> 🐳 Docker support coming soon™
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Clone the repository:
 
-### `npm run eject`
+```bash
+git clone https://github.com/Rzanklod/consiliumfrontend.git
+cd consiliumfrontend
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+2. Install project dependencies:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npm install
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+3. Run the application in development mode:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+npm start
+```
 
-## Learn More
+4. Open your browser and go to:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```bash
+http://localhost:3000
+```
