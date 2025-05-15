@@ -1,0 +1,31 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh; 
+  gap: 1rem;
+}
+
+.navbar {
+  width: 100%;
+  display: flex;
+  background-color: gray;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.app-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+footer {
+  margin-top: auto;
+  width: 100%;
+  text-align: center;
+  padding: 0.25rem;
+}

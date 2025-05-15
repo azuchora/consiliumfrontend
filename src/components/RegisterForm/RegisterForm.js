@@ -3,10 +3,11 @@ import { LENGTH_LIMITS, USER_REGEX_STR, PASSWORD_REGEX_STR } from '../../constan
 import { isEmail } from 'validator';
 import TextInput from './TextInput';
 import PasswordInput from './PasswordInput';
-import SuccessMessage from './SuccessMessage';
+import SuccessMessage from '../messages/SuccessMessage';
 import ErrorMessage from '../messages/ErrorMessage';
 import './RegisterForm.css';
 import axios from '../../api/axios';
+import { Link } from 'react-router-dom';
 
 const USER_REGEX = new RegExp(USER_REGEX_STR);
 const PASSWORD_REGEX = new RegExp(PASSWORD_REGEX_STR);
@@ -162,6 +163,11 @@ const RegisterForm = () => {
           >
             Zarejestruj się
           </button>
+          <p className='register-form-login'>
+            Masz już konto?
+            <br />
+            <Link to='/login' className='register-form-link'>Zaloguj się</Link>
+          </p>
         </form>
       </section>
     )}

@@ -8,6 +8,8 @@ import RequireAuth from './components/RequireAuth/RequireAuth';
 import { Testowy } from './components/Testowy';
 import { ROLES } from './constants/roles';
 import "./App.css";
+import VerifyForm from './components/VerifyForm/VerifyForm';
+import PersistLogin from './components/PersistLogin/PersistLogin';
 
 function App() {
   return (
@@ -21,8 +23,14 @@ function App() {
         <Route path='*' element={<Missing />} />
 
         {/* Private (role + auth based)  */}
-        <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
-          <Route path='home' element={<Testowy />} />
+        <Route element={<PersistLogin />}>
+          <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
+            <Route path='verify' element={<VerifyForm />} />
+          </Route>
+
+          <Route element={<RequireAuth allowedRoles={[ROLES.Verified]} />}>
+            <Route path='home' element={<Testowy />} />
+          </Route>
         </Route>
       </Route>
     </Routes>

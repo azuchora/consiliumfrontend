@@ -6,11 +6,11 @@ import axios from '../../api/axios';
 import './LoginForm.css';
 
 const LoginForm = () => {
-  const { setAuth } = useAuth();
+  const { setAuth, persist, setPersist, auth } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/home';
+  const from = location.state?.from?.pathname || '/';
 
   const userRef = useRef();
   const errRef = useRef();
@@ -18,6 +18,12 @@ const LoginForm = () => {
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    if (auth?.accessToken) {
+      navigate(from, { replace: true });
+    }
+  }, [auth?.accessToken]);
 
   useEffect(() => {
     userRef.current.focus();
@@ -62,6 +68,14 @@ const LoginForm = () => {
     }
   }
 
+  const togglePersist = () => {
+    setPersist(prev => !prev);
+  }
+
+  useEffect(() => {
+    localStorage.setItem('persist', persist);
+  }, [persist]);
+
   return (
     <section className='login-form-container'>
       <ErrorMessage message={errorMessage} errRef={errRef}/>
@@ -91,8 +105,17 @@ const LoginForm = () => {
         />
 
         <button className='login-form-btn'>Zaloguj się</button>
+        <section className='login-form-persist-check'>
+          <input 
+            type='checkbox'
+            id='persist'
+            onChange={togglePersist}
+            checked={persist}
+          />
+          <label htmlFor='persist'>Zaufaj temu urządzeniu</label>
+        </section>
       </form>
-      <Link to='/' className='login-form-link'>Nie pamiętasz hasła?</Link>
+      <Link to='/recover' className='login-form-link'>Nie pamiętasz hasła?</Link>
       <hr />
       <p className='login-form-signup'>
         Nie masz konta?<br/>

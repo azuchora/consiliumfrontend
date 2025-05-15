@@ -1,7 +1,7 @@
 .login-form-container {
   width: 100%;
   max-width: 420px;
-  min-height: 400px;
+  min-height: 500px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -63,3 +63,27 @@
 .login-form-btn {
   padding: 0.5rem;
 }
+
+.login-form-persist-check {
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+}
+
+.login-form-persist-check label {
+  margin: 0;
+  padding: 0.125rem;
+}
+
+.login-form-persist-check input {
+  height: 1.125rem;
+  width: 1.125rem;
+  margin: 0 0.25rem 0.125rem 0.125rem;
+}
+
+.login-form-persist-check input:hover {
+  cursor: pointer;
+}
+

@@ -7,6 +7,7 @@ export const Testowy = () => {
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
   const location = useLocation();
+  const [x, setX] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
@@ -34,7 +35,7 @@ export const Testowy = () => {
       isMounted = false;
       controller.abort();
     }
-  }, []);
+  }, [x]);
 
   return (
     <article>
@@ -46,6 +47,7 @@ export const Testowy = () => {
           </ul>
         ) : <p> Brak postów </p>
       }
+      <button onClick={() => setX(x + 1)}>Klik</button>
     </article>
   )
 }
