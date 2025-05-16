@@ -29,7 +29,7 @@ Aplikacja służy jako **zamknięte forum dyskusyjne dla lekarzy**, które wspie
 ## 🚀 Jak uruchomić frontend lokalnie
 
 > ⚠️
-> Aplikacja wymaga działającego backendu (API). Link do backendu: [consiliumbackend](https://github.com/Rzanklod/consiliumbackend)
+> Aplikacja wymaga działającego backendu (API). Link do backendu: [consiliumbackend](https://github.com/azuchora/consiliumbackend)
 > 🐳 Wsparcie dla Dockera już wkrótce™
 
 1. Sklonuj repozytorium:
