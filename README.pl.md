@@ -35,7 +35,7 @@ Aplikacja służy jako **zamknięte forum dyskusyjne dla lekarzy**, które wspie
 1. Sklonuj repozytorium:
 
 ```bash
-git clone https://github.com/Rzanklod/consiliumfrontend.git
+git clone https://github.com/azuchora/consiliumfrontend.git
 cd consiliumfrontend
 ```
 

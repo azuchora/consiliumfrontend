@@ -35,7 +35,7 @@ The application serves as a **closed discussion forum** for doctors, supporting 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/Rzanklod/consiliumfrontend.git
+git clone https://github.com/azuchora/consiliumfrontend.git
 cd consiliumfrontend
 ```
 
