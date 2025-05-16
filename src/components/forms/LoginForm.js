@@ -3,6 +3,7 @@ import ErrorMessage from '../messages/ErrorMessage';
 import useAuth from '../../hooks/useAuth';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from '../../api/axios';
+import { ROLES } from '../../constants/roles';
 import './LoginForm.css';
 
 const LoginForm = () => {
@@ -11,7 +12,7 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || '/home';
+  const from = location.state?.from?.pathname;
 
   const userRef = useRef();
   const errRef = useRef();
@@ -22,7 +23,12 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (auth?.accessToken) {
-      navigate(from, { replace: true });
+      if(auth?.roles.includes(ROLES.Verified)){
+        console.log(auth);
+        navigate('/home', { replace: true});
+      } else {
+        navigate('/verify', { replace: true });
+      }
     }
   }, [auth?.accessToken]);
 

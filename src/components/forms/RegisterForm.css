@@ -1,7 +1,7 @@
 .register-form-container {
   width: 100%;
-  max-width: 420px;
-  min-height: 400px;
+  max-width: 20rem;
+  min-height: 20rem;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
