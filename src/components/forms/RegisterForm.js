@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { LENGTH_LIMITS, USER_REGEX_STR, PASSWORD_REGEX_STR } from '../../constants/validation';
 import { isEmail } from 'validator';
-import TextInput from './TextInput';
-import PasswordInput from './PasswordInput';
+import FormTextInput from '../inputs/FormTextInput';
+import PasswordInput from '../inputs/PasswordInput';
 import SuccessMessage from '../messages/SuccessMessage';
 import ErrorMessage from '../messages/ErrorMessage';
 import './RegisterForm.css';
@@ -103,7 +103,7 @@ const RegisterForm = () => {
         <ErrorMessage message={errorMessage} errRef={errRef}/>
         <h1 className='register-form-title'>Rejestracja</h1>
         <form className='register-form' onSubmit={handleSubmit}>
-          <TextInput
+          <FormTextInput
             label='Nazwa użytkownika'
             id='username'
             ref={userRef}
@@ -113,12 +113,13 @@ const RegisterForm = () => {
             isFocused={userFocus}
             onFocus={() => setUserFocus(true)}
             onBlur={() => setUserFocus(false)}
+            cName='register-form'
             helperText={
               `Od ${LENGTH_LIMITS.USERNAME_MIN} do ${LENGTH_LIMITS.USERNAME_MAX} znaków.` +
               'Litery, cyfry, podkreślniki, myślniki są dozwolone.'}
           />
 
-          <TextInput 
+          <FormTextInput 
             label='Adres e-mail:'
             id='email'
             value={email}
@@ -127,6 +128,7 @@ const RegisterForm = () => {
             isFocused={emailFocus}
             onFocus={() => setEmailFocus(true)}
             onBlur={() => setEmailFocus(false)}
+            cName='register-form'
             helperText='Wprowadź poprawny adres e-mail (np. przykład@domena.pl).'
           />
 
