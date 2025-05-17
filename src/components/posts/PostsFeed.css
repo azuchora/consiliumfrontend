@@ -1,0 +1,32 @@
+.posts-feed-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  align-items: center;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  scroll-behavior: smooth;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.posts-feed-container li {
+  list-style: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.posts-feed-list {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  font-size: 0.875rem;
+  max-width: 40rem;
+  box-sizing: border-box;
+}
+
+.posts-feed ul {
+  display: flex;
+  flex-direction: column;
+}
