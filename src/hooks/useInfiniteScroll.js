@@ -45,17 +45,19 @@ const useInfiniteScroll = ({
   const handleScroll = debounce(async () => {
     const bottom =
       Math.ceil(window.innerHeight + window.scrollY) >=
-      document.documentElement.scrollHeight - 200;
+      document.documentElement.scrollHeight - 250;
     if(bottom && !isFetching){
       await loadData();
     }
-  }, 200);
+  }, 50);
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
+    window.addEventListener('touchmove', handleScroll);
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('touchmove', handleScroll);
     }
   }, [isFetching]);
 
