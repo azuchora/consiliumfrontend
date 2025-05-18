@@ -6,6 +6,8 @@ import FilePreview from './FilePreview';
 import PreviewModal from './PreviewModal';
 import './PostPreview.css';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar, faComment, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
 const PostPreview = ({ post, visible }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -25,13 +27,13 @@ const PostPreview = ({ post, visible }) => {
   return (
     <>
       <section className={`post-preview-item ${isVisible ? 'visible' : ''}`}>
-        <header className="post-preview-header">
+        <div className="post-preview-header">
           <div className="post-preview-avatar">
             <Link to={`users/${post.username}`} className='post-preview-link'>
               {post?.avatar == null ? 
                 post.username?.[0].toUpperCase()
                : (
-                <img src={`${BACKEND_URL}/static/${post.avatar}`} className='post-preview-avatar-img'/>
+                <img src={`${BACKEND_URL}/static/${post.avatar}`} className='post-preview-avatar-img' alt='author avatar'/>
               )}
             </Link>
           </div>
@@ -43,7 +45,7 @@ const PostPreview = ({ post, visible }) => {
             </strong>
             <div className="post-preview-date">{formatDate(post.created_at)}</div>
           </div>
-        </header>
+        </div>
         <h3 className="post-preview-title">{post.title}</h3>
 
         <p className="post-preview-description">{post.description}</p>
@@ -72,17 +74,30 @@ const PostPreview = ({ post, visible }) => {
         )}
 
         <hr />
-
-        <footer className="post-preview-footer">
-          {post.is_answered ? (
+        
+          {/* {post.is_answered ? (
             <span className="answered">Weź udział w dyskusji</span>
           ) : (
             <span className="not-answered">Brak odpowiedzi</span>
           )}
           {post.post_status_id && (
             <span className="status">Status: {post.post_status_id}</span>
-          )}
-        </footer>
+          )} */}
+        <div className="post-preview-footer">
+          <div className='post-preview-vote'>
+            <button className='post-preview-vote-btn'>
+              <FontAwesomeIcon icon={faChevronUp} color='#00FF00' style={{fontSize: '1.125rem'}}/>
+            </button>
+            <span>2</span>
+            <button className='post-preview-vote-btn'>
+              <FontAwesomeIcon icon={faChevronDown} color='#ff0000' style={{fontSize: '1.125rem'}}/>
+            </button>
+          </div>
+          <div className='post-preview-comment'>
+            <FontAwesomeIcon icon={faComment} style={{ cursor: 'pointer', fontSize: '1.125rem' }}/>
+            <span>Odpowiedz</span>
+          </div>
+        </div>
       </section>
 
       <PreviewModal previewFile={previewFile} onClose={closePreview} />

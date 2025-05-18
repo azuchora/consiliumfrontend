@@ -52,7 +52,7 @@ const LoginForm = () => {
           withCredentials: true
         }
       );
-      console.log(response?.data);
+
       const accessToken = response?.data?.accessToken;
       const uid = response?.data?.id;
       const avatarFilename = response?.data?.avatarFilename;

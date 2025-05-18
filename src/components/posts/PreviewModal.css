@@ -24,7 +24,7 @@
   box-sizing: border-box;
 }
 
-.modal-close {
+/* .modal-close {
   position: absolute;
   top: 0.25rem;
   right: 0.5rem;
@@ -32,7 +32,7 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-}
+} */
 
 .modal-image {
   max-width: 100%;

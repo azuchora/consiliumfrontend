@@ -6,11 +6,11 @@
   opacity: 0;
   box-sizing: border-box;
   margin: 0.75rem;
-  padding: 0.75rem 1rem;
+  padding: 1rem;
   transform: translateY(1.25rem);
   transition: opacity 0.5s ease, transform 0.5s ease;
   border: 0.1rem solid #000000;
-  border-radius: 0.5rem;
+  border-radius: 1.5rem;
   background-color: #fff;
   box-shadow: 0 0.625rem 0.25rem rgba(0, 0, 0, 0.1);
 }
@@ -37,6 +37,23 @@
   gap: 0.75rem;
 }
 
+.post-preview-vote-btn {
+  border: none;
+  padding: 0.125rem;
+  cursor: pointer;
+}
+
+.post-preview-vote-btn:hover {
+  background-color: #888;
+  border-radius: 50%;
+}
+
+.post-preview-vote-btn:active {
+  transform: scale(0.9);
+  background-color: #666;
+  transition: transform 0.05s, background-color 0.1s;
+}
+
 .post-preview-avatar {
   width: 2.5rem;
   height: 2.5rem;
@@ -50,6 +67,30 @@
   color: #555;
   position: relative;
   overflow: hidden;
+}
+
+.post-preview-comment {
+  display: flex;
+  flex-direction: column;
+}
+
+.post-preview-vote {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background-color: #f2f2f2;
+  border: 0.075rem solid #f2f2f2;;
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  padding-top: 0.5rem;
+  font-weight: 600;
+}
+
+.post-preview-helpful {
+  display: flex;
+  flex-direction: column;
+  color: #666;
+  font-size: 0.75rem;
 }
 
 .post-preview-avatar img {
@@ -91,12 +132,15 @@
 
 .post-preview-footer {
   display: flex;
+  flex-wrap: wrap;
   margin-top: 0.75rem;
   font-size: 0.75rem;
+  justify-content: space-between;
+  gap: 0.75rem;
   color: #888;
 }
 
-.post-preview-footer .answered {
+/* .post-preview-footer .answered {
   color: green;
   font-weight: 600;
 }
@@ -104,7 +148,7 @@
 .post-preview-footer .not-answered {
   color: red;
   font-weight: 600;
-}
+} */
 
 .post-preview-footer .status {
   margin-left: 1rem;

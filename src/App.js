@@ -9,6 +9,7 @@ import PersistLogin from './components/auth/PersistLogin';
 import RegisterForm from './components/forms/RegisterForm';
 import LoginForm from './components/forms/LoginForm';
 import VerifyForm from './components/forms/VerifyForm';
+import PostsFeed from './components/posts/PostsFeed';
 import "./App.css";
 
 function App() {
@@ -31,7 +32,7 @@ function App() {
           </Route>
 
           <Route element={<RequireAuth allowedRoles={[ROLES.Verified]} />}>
-            <Route path='home' element={<Testowy />} />
+            <Route path='home' element={<PostsFeed />} />
           </Route>
         </Route>
       </Route>

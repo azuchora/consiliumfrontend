@@ -17,6 +17,15 @@
   width: 100%;
 }
 
+.end-of-posts {
+  text-align: center;
+  color: #888;
+  font-size: 1.1rem;
+  margin: 2rem 0;
+  font-style: italic;
+  opacity: 0.8;
+}
+
 .posts-feed-list {
   display: flex;
   width: 100%;

@@ -6,7 +6,6 @@ const PreviewModal = ({ previewFile, onClose }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>✖</button>
         {previewFile.type === 'image' && (
           <img src={previewFile.url} alt="Preview" className="modal-image" />
         )}
