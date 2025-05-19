@@ -1,15 +1,15 @@
 import { Routes, Route } from 'react-router-dom';
-import { Testowy } from './components/Testowy';
 import { ROLES } from './constants/roles';
 import Layout from './components/Layout/Layout';
-import Unauthorized from './components/messages/Unauthorized';
-import Missing from './components/messages/Missing';
+import UnauthorizedPage from './pages/UnauthorizedPage';
+import MissingPage from './pages/MissingPage';
 import RequireAuth from './components/auth/RequireAuth';
 import PersistLogin from './components/auth/PersistLogin';
-import RegisterForm from './components/forms/RegisterForm';
-import LoginForm from './components/forms/LoginForm';
-import VerifyForm from './components/forms/VerifyForm';
-import PostsFeed from './components/posts/PostsFeed';
+import RegisterPage from './pages/RegisterPage';
+import LoginPage from './pages/LoginPage';
+import HomePage from './pages/HomePage';
+import VerifyPage from './pages/VerifyPage';
+import BrowsePostsPage from './pages/BrowsePostsPage';
 import "./App.css";
 
 function App() {
@@ -17,22 +17,23 @@ function App() {
     <Routes>
       <Route path='/' element={<Layout />}>
         {/* Public */}
-        <Route path='register' element={<RegisterForm />} />   
-        <Route path='unauthorized' element={<Unauthorized />} />
+        <Route path='register' element={<RegisterPage />} />   
+        <Route path='unauthorized' element={<UnauthorizedPage />} />
+        <Route path='/' element={<HomePage />} />
 
-        <Route path='*' element={<Missing />} />
+        <Route path='*' element={<MissingPage />} />
 
         {/* Private (except for login)*/}
         <Route element={<PersistLogin />}>
         
-          <Route path='login' element={<LoginForm />} />
+          <Route path='login' element={<LoginPage />} />
 
           <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
-            <Route path='verify' element={<VerifyForm />} />
+            <Route path='verify' element={<VerifyPage />} />
           </Route>
 
           <Route element={<RequireAuth allowedRoles={[ROLES.Verified]} />}>
-            <Route path='home' element={<PostsFeed />} />
+            <Route path='main' element={<BrowsePostsPage />} />
           </Route>
         </Route>
       </Route>

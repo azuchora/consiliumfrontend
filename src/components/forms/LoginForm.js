@@ -24,8 +24,7 @@ const LoginForm = () => {
   useEffect(() => {
     if (auth?.accessToken) {
       if(auth?.roles.includes(ROLES.Verified)){
-        console.log(auth);
-        navigate('/home', { replace: true});
+        navigate('/main', { replace: true});
       } else {
         navigate('/verify', { replace: true });
       }
