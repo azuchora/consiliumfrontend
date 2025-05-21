@@ -11,6 +11,7 @@ import HomePage from './pages/HomePage';
 import VerifyPage from './pages/VerifyPage';
 import BrowsePostsPage from './pages/BrowsePostsPage';
 import "./App.css";
+import PostPage from './pages/PostPage';
 
 function App() {
   return (
@@ -33,7 +34,8 @@ function App() {
           </Route>
 
           <Route element={<RequireAuth allowedRoles={[ROLES.Verified]} />}>
-            <Route path='main' element={<BrowsePostsPage />} />
+            <Route path='posts' element={<BrowsePostsPage />} />
+            <Route path='posts/:id' element={<PostPage />} />
           </Route>
         </Route>
       </Route>

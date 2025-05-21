@@ -1,5 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
 
+:root {
+  --primary-color: #003366;
+  --secondary-color: #f5f7fa;
+  --accent-color: dodgerblue;
+  --text-color: #1a1a1a;
+  --footer-bg: #e1e4e8;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -14,7 +22,7 @@ html {
 
 body {
     min-height: 100vh;
-    background-color: dodgerblue;
+    background-color: var(--accent-color);
 }
 
 .instructions {
