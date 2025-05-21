@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 import useInfiniteScroll from '../../hooks/useInfiniteScroll';
 import './PostsFeed.css';
@@ -73,19 +73,23 @@ const PostsFeed = () => {
     },
   });
 
+  const renderedPosts = useMemo(() => {
+    return posts.map((post) => (
+      <li key={post.id}>
+        <PostPreview
+          post={post}
+          visible={!post.isNew || visiblePostIds.includes(post.id)}
+        />
+      </li>
+    ));
+  }, [posts, visiblePostIds]);
+
   return (
     <article className="posts-feed-container">
       <section className="posts-feed-list">
         {posts.length > 0 ? (
           <ul>
-            {posts.map((post) => (
-              <li key={post.id}>
-                <PostPreview
-                  post={post}
-                  visible={!post.isNew || visiblePostIds.includes(post.id)}
-                />
-              </li>
-            ))}
+            {renderedPosts}
           </ul>
         ) : (
           !isFetching && <p>Brak postów</p>

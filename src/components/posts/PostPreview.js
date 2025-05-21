@@ -7,14 +7,14 @@ import PreviewModal from './PreviewModal';
 import './PostPreview.css';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar, faComment, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faComment, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
 const PostPreview = ({ post, visible }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [previewFile, setPreviewFile] = useState(null);
   const formatDate = useFormatDate();
   const { isImage } = useFileTypeCheck();
-  
+
   useEffect(() => {
     if (visible) setIsVisible(true);
   }, [visible]);
@@ -23,7 +23,7 @@ const PostPreview = ({ post, visible }) => {
   const otherFiles = post.files?.filter(file => !isImage(file.filename)) || [];
 
   const closePreview = () => setPreviewFile(null);
-
+  
   return (
     <>
       <section className={`post-preview-item ${isVisible ? 'visible' : ''}`}>

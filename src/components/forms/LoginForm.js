@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useRef, useState, useEffect } from 'react';
 import ErrorMessage from '../messages/ErrorMessage';
 import useAuth from '../../hooks/useAuth';
@@ -7,7 +8,7 @@ import { ROLES } from '../../constants/roles';
 import './LoginForm.css';
 
 const LoginForm = () => {
-  const { setAuth, persist, setPersist, auth } = useAuth();
+  const { setAuth, persist, setPersist, auth, setAvatar, setUsername } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -24,7 +25,7 @@ const LoginForm = () => {
   useEffect(() => {
     if (auth?.accessToken) {
       if(auth?.roles.includes(ROLES.Verified)){
-        navigate('/main', { replace: true});
+        navigate('/posts', { replace: true});
       } else {
         navigate('/verify', { replace: true });
       }
@@ -57,6 +58,8 @@ const LoginForm = () => {
       const avatarFilename = response?.data?.avatarFilename;
       const roles = response?.data?.roles;
       setAuth({ user, uid, avatarFilename, roles, accessToken });
+      setAvatar(avatarFilename);
+      setUsername(user);
       setUser('');
       setPassword('')
       navigate(from, { replace: true }); 

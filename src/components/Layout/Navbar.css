@@ -174,8 +174,10 @@
   .desktop-only {
     display: none;
   }
+}
 
-  /* .navbar-left {
+@media (max-width: 259px) {
+  .navbar-left {
     display: none;
-  } */
+  }
 }
