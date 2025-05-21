@@ -4,13 +4,16 @@ import useAuth from '../../hooks/useAuth';
 import useLogout from '../../hooks/useLogout';
 import './Navbar.css';
 import { BACKEND_URL } from '../../api/axios';
+import { faSignInAlt, faUserPlus, faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const Navbar = () => {
-  const { auth } = useAuth();
+  const { isAuthed, username, avatar } = useAuth();
   const logout = useLogout();
   const navigate = useNavigate();
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const dropdownRef = useRef();
 
   const handleLogout = async () => {
@@ -22,6 +25,10 @@ const Navbar = () => {
     setDropdownOpen(prev => !prev);
   };
 
+  const toggleMenu = () => {
+    setMenuOpen(prev => !prev);
+  };
+  
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -33,43 +40,71 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="navbar">
-      <div className="navbar-left">
-        <Link to="/" className="navbar-logo">Consilium</Link>
-      </div>
+    <>
+      <nav className="navbar">
+        <div className="navbar-left">
+          <Link to="/" className="navbar-logo">Consilium</Link>
+        </div>
 
-      <div className="navbar-right">
-        {!auth?.accessToken ? (
-          <>
-            <Link to="/login" className="navbar-link">Zaloguj</Link>
-            <Link to="/register" className="navbar-link">Zarejestruj</Link>
-          </>
-        ) : (
-          <div className="navbar-user" ref={dropdownRef}>
-            <img
-              src={`${BACKEND_URL}/static/${auth.avatarFilename}`}
-              alt="Avatar"
-              className="navbar-avatar"
-            />
-            <span className="navbar-username">{auth.user}</span>
-            <button
-              className="settings-button"
-              onClick={toggleDropdown}
-              aria-label="Ustawienia"
-            >
-              ⚙️
-            </button>
-            {dropdownOpen && (
-              <div className="dropdown-menu">
-                <button onClick={handleLogout} className="dropdown-item">
-                  Wyloguj
-                </button>
-              </div>
-            )}
-          </div>
-        )}
+        <div className="navbar-right">
+          <button className="menu-toggle mobile-only" onClick={toggleMenu} aria-label="Otwórz menu">
+            <FontAwesomeIcon icon={faBars} />
+          </button>
+
+          {!isAuthed() ? (
+            <div className='navbar-login desktop-only'>
+              <Link to="/login" className="navbar-link">
+                <FontAwesomeIcon icon={faSignInAlt} style={{marginRight: '0.5rem'}}/>
+                Zaloguj
+              </Link>
+              <Link to="/register" className="navbar-link">
+                <FontAwesomeIcon icon={faUserPlus} style={{ marginRight: '0.5rem' }} />
+                Zarejestruj
+              </Link>
+            </div>
+          ) : (
+            <div className="navbar-user desktop-only" ref={dropdownRef}>
+              <img
+                src={`${BACKEND_URL}/static/${avatar}`}
+                alt="Avatar"
+                className="navbar-avatar"
+              />
+              <span className="navbar-username">{username}</span>
+              <button className="settings-button" onClick={toggleDropdown} aria-label="Ustawienia">
+                ⚙️
+              </button>
+              {dropdownOpen && (
+                <div className="dropdown-menu">
+                  <button onClick={handleLogout} className="dropdown-item">
+                    Wyloguj
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </nav>
+
+      <div className={`side-menu ${menuOpen ? 'open' : ''}`}>
+        <button className="close-button" onClick={toggleMenu}>
+          <FontAwesomeIcon icon={faTimes} />
+        </button>
+        <div className="side-menu-links">
+          <Link to="/" onClick={toggleMenu}>Strona główna</Link>
+          {!isAuthed() ? (
+            <>
+              <Link to="/login" onClick={toggleMenu}>Zaloguj</Link>
+              <Link to="/register" onClick={toggleMenu}>Zarejestruj</Link>
+            </>
+          ) : (
+            <>
+              <Link to='/posts' onClick={toggleMenu}>Forum</Link>
+              <button onClick={() => { handleLogout(); toggleMenu(); }}>Wyloguj</button>
+            </>
+          )}
+        </div>
       </div>
-    </nav>
+    </>
   );
 };
 
