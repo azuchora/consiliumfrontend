@@ -1,24 +1,8 @@
 import './HomePage.css';
-import { useNavigate } from 'react-router-dom';
-import useAuth from '../hooks/useAuth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComments, faFolderOpen, faShieldAlt } from '@fortawesome/free-solid-svg-icons';
 
 const HomePage = () => {
-  const navigate = useNavigate();
-  const { auth } = useAuth();
-
-  const handleGoToForum = () => {
-    navigate('/main');
-  };
-
-  const handleGoToLogin = () => {
-    navigate('/login');
-  }
-
-  const handleGoToRegister = () => {
-    navigate('/register');
-  }
 
   return (
     <div className="home-container">
@@ -32,16 +16,6 @@ const HomePage = () => {
         <p className="home-hero-text">
           Wymieniaj się wiedzą, pytaj, konsultuj przypadki, ucz się razem z innymi specjalistami.
         </p>
-        <div className="home-buttons">
-          <button onClick={handleGoToLogin} className="home-button-primary">Zaloguj się</button>
-          <button onClick={handleGoToRegister} className="home-button-secondary">Zarejestruj się</button>
-
-          {auth?.accessToken && (
-            <button className="home-button-primary" onClick={handleGoToForum}>
-              Przejdź do forum
-            </button>
-          )}
-        </div>
       </section>
 
       <section className="home-features">
