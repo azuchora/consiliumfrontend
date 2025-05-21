@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 
 const debounce = (func, delay) => {
@@ -50,7 +51,7 @@ const useInfiniteScroll = ({
       await loadData();
     }
   }, 50);
-
+  
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('touchmove', handleScroll);
