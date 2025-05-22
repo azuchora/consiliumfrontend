@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import "./AddCommentForm.css";
 
@@ -7,6 +7,7 @@ const AddCommentForm = ({ postId, parentCommentId = null, onCommentAdded }) => {
   const [files, setFiles] = useState([]);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef(null);
 
   const axiosPrivate = useAxiosPrivate();
 
@@ -17,7 +18,7 @@ const AddCommentForm = ({ postId, parentCommentId = null, onCommentAdded }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-
+    
     if (!content.trim()) {
       setError("Treść komentarza nie może być pusta");
       return;
@@ -30,7 +31,7 @@ const AddCommentForm = ({ postId, parentCommentId = null, onCommentAdded }) => {
       formData.append("content", content);
       formData.append("postId", postId);
 
-      if (parentCommentId !== null) {
+      if(parentCommentId !== null){
         formData.append("parentCommentId", parentCommentId);
       }
 
@@ -44,6 +45,9 @@ const AddCommentForm = ({ postId, parentCommentId = null, onCommentAdded }) => {
         },
       });
 
+      if(fileInputRef.current){
+        fileInputRef.current.value = null;
+      }
       setContent("");
       setFiles([]);
       if (onCommentAdded) onCommentAdded(response.data.comment);
@@ -68,6 +72,7 @@ const AddCommentForm = ({ postId, parentCommentId = null, onCommentAdded }) => {
       <input
         type="file"
         multiple
+        ref={fileInputRef}
         onChange={handleFileChange}
         disabled={isSubmitting}
       />
