@@ -66,6 +66,18 @@
 .post-preview-comment {
   display: flex;
   flex-direction: column;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+}
+
+.post-preview-comment:hover {
+  transform: scale(1.1);
+}
+
+.post-preview-comment:active {
+  transform: scale(1);
 }
 
 .post-preview-vote {

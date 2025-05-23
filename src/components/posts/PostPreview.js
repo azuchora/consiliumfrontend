@@ -5,7 +5,7 @@ import useFileTypeCheck from '../../hooks/useFileTypeCheck';
 import FilePreview from './FilePreview';
 import PreviewModal from './PreviewModal';
 import './PostPreview.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
@@ -13,6 +13,11 @@ const PostPreview = ({ post, isPage = false }) => {
   const [previewFile, setPreviewFile] = useState(null);
   const formatDate = useFormatDate();
   const { isImage } = useFileTypeCheck();
+  
+  const navigate = useNavigate();
+  const handleGoToPost = () => {
+    navigate(`/posts/${post.id}`);
+  }
 
   const imageFiles = post.files?.filter(file => isImage(file.filename)) || [];
   const otherFiles = post.files?.filter(file => !isImage(file.filename)) || [];
@@ -28,7 +33,7 @@ const PostPreview = ({ post, isPage = false }) => {
       <section className="post-preview-item">
         <div className="post-preview-header">
           <div className="post-preview-avatar">
-            <Link to={`users/${post.users.username}`} className='post-preview-link'>
+            <Link to={`/users/${post.users.username}`} className='post-preview-link'>
               {authorAvatar == null ? 
                 post.users.username?.[0].toUpperCase()
                : (
@@ -38,7 +43,7 @@ const PostPreview = ({ post, isPage = false }) => {
           </div>
           <div className="post-preview-userinfo">
             <strong className="post-preview-username">
-              <Link to={`users/${post.users.username}`} className='post-preview-link'>
+              <Link to={`/users/${post.users.username}`} className='post-preview-link'>
                 {`${post?.users.name} ${post.users.surname}`}
               </Link>
             </strong>
@@ -93,10 +98,10 @@ const PostPreview = ({ post, isPage = false }) => {
             </button>
           </div>
           {!isPage && (
-            <div className='post-preview-comment'>
-              <FontAwesomeIcon icon={faComment} style={{ cursor: 'pointer', fontSize: '1.125rem' }}/>
+            <button className='post-preview-comment' onClick={handleGoToPost}>
+              <FontAwesomeIcon icon={faComment} style={{ fontSize: '1.125rem' }}/>
               <span>Odpowiedz</span>
-            </div>
+            </button>
           )}
         </div>
       </section>

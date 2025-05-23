@@ -18,8 +18,8 @@ const AddCommentForm = ({ postId, parentCommentId = null, onCommentAdded }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    
-    if (!content.trim()) {
+
+    if(!content.trim()){
       setError("Treść komentarza nie może być pusta");
       return;
     }
@@ -48,6 +48,7 @@ const AddCommentForm = ({ postId, parentCommentId = null, onCommentAdded }) => {
       if(fileInputRef.current){
         fileInputRef.current.value = null;
       }
+
       setContent("");
       setFiles([]);
       if (onCommentAdded) onCommentAdded(response.data.comment);
@@ -70,12 +71,23 @@ const AddCommentForm = ({ postId, parentCommentId = null, onCommentAdded }) => {
       />
 
       <input
+        id="fileUpload"
         type="file"
+        className="hidden-file-input"
         multiple
         ref={fileInputRef}
         onChange={handleFileChange}
         disabled={isSubmitting}
       />
+
+      <button
+        type="button"
+        onClick={() => fileInputRef.current?.click()}
+        disabled={isSubmitting}
+        className="comment-file-btn"
+      >
+        Wybierz pliki
+      </button>
 
       {files.length > 0 && (
         <div className="selected-files">
@@ -99,7 +111,7 @@ const AddCommentForm = ({ postId, parentCommentId = null, onCommentAdded }) => {
 
       {error && <p className="error-message">{error}</p>}
 
-      <button type="submit" disabled={isSubmitting}>
+      <button type="submit" disabled={isSubmitting} className="comment-add-btn">
         {isSubmitting ? "Dodawanie..." : "Dodaj komentarz"}
       </button>
     </form>

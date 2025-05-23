@@ -3,7 +3,6 @@
   flex-direction: column;
   width: 100%;
   max-width: 100%;
-  margin-top: 1rem;
   color: var(--text-color);
   box-sizing: border-box;
   padding: 0.5rem;
@@ -55,11 +54,10 @@
   flex-shrink: 0;
 }
 
-.add-comment-form button {
+.comment-add-btn,
+.comment-file-btn {
   margin-top: 0.5rem;
-  background-color: #003366;
   color: white;
-  padding: 0.5rem 1rem;
   border: none;
   border-radius: 0.25rem;
   max-width: 100%;
@@ -70,3 +68,28 @@
   box-sizing: border-box;
   word-break: break-all;
 }
+
+.comment-file-btn {
+  padding: 0.175rem;
+  color: var(--text-color);
+  background-color: var(--secondary-color);
+  border: 0.075rem solid black;
+}
+
+.comment-add-btn {
+  padding: 0.5rem;
+  background-color: var(--primary-color);
+}
+
+.add-comment-form button:hover {
+  background-color: var(--accent-color);
+}
+
+.add-comment-form button:active {
+  transform: scale(0.9);
+}
+
+.hidden-file-input {
+  display: none;
+}
+

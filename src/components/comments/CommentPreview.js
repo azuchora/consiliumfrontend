@@ -8,8 +8,10 @@ import useFileTypeCheck from "../../hooks/useFileTypeCheck";
 import useSocketEvent from "../../hooks/useSocketEvent";
 import AddCommentForm from "../forms/AddCommentForm";
 import "./CommentPreview.css";
+import { Link } from "react-router-dom";
+import useFormatDate from "../../hooks/useFormatDate";
 
-const CommentPreview = ({ comment, depth = 0, socket }) => {
+const CommentPreview = ({ comment, socket }) => {
   const axiosPrivate = useAxiosPrivate();
   const { isImage } = useFileTypeCheck();
 
@@ -20,6 +22,7 @@ const CommentPreview = ({ comment, depth = 0, socket }) => {
   const [previewFile, setPreviewFile] = useState(null);
   const [isLoadingReplies, setIsLoadingReplies] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
+  const formatDate = useFormatDate();
 
   const isParentComment = comment.commentId === null;
 
@@ -61,7 +64,7 @@ const CommentPreview = ({ comment, depth = 0, socket }) => {
   }, [axiosPrivate, comment.id, replies, hasMoreReplies, isLoadingReplies]);
 
   const toggleReplies = () => {
-    if (!isRepliesVisible && replies.length === 0) {
+    if(!isRepliesVisible && replies.length === 0){
       setReplies([]);
       setHasMoreReplies(true);
       fetchReplies();
@@ -77,7 +80,7 @@ const CommentPreview = ({ comment, depth = 0, socket }) => {
         newComment.commentId === comment.id
       ) {
         setReplies((prev) => {
-          if (prev.some((r) => r.id === newComment.id)) {
+          if(prev.some((r) => r.id === newComment.id)){
             return prev;
           }
           return [newComment, ...prev];
@@ -100,16 +103,35 @@ const CommentPreview = ({ comment, depth = 0, socket }) => {
     setIsReplying(false);
     setHasMoreReplies(true);
   };
+  
+  const authorAvatar = comment?.users?.files[0]?.filename;
 
   return (
     <div className={`comment-preview ${!isParentComment ? "child-comment" : ""}`}>
+      <div className="comment-preview-header">
+        <div className="comment-preview-avatar">
+          <Link to={`/users/${comment.users.username}`} className='comment-preview-link'>
+            {authorAvatar == null ? 
+              comment.users.username?.[0].toUpperCase()
+              : (
+              <img src={`${BACKEND_URL}/static/${authorAvatar}`} className='comment-preview-avatar-img' alt='author avatar'/>
+            )}
+          </Link>
+        </div>
+        <div className="comment-preview-userinfo">
+          <strong className="comment-preview-username">
+            <Link to={`/users/${comment.users.username}`} className='comment-preview-link'>
+              {`${comment?.users.name} ${comment.users.surname}`}
+            </Link>
+          </strong>
+          <div className="comment-preview-date">{formatDate(comment.createdAt)}</div>
+        </div>
+      </div>
       <div className="comment-content">
         <p>{comment.content}</p>
-        <div className="comment-meta">
-          <small>Utworzono: {new Date(comment.createdAt).toLocaleString()}</small>
-          <br />
-          <small>Aktualizacja: {new Date(comment.updatedAt).toLocaleString()}</small>
-        </div>
+        {/* <div className="comment-meta">
+          <small>{formatDate(comment.createdAt)}</small>
+        </div> */}
 
         {imageFiles.length > 0 && (
           <div className="comment-image-files">
@@ -175,7 +197,7 @@ const CommentPreview = ({ comment, depth = 0, socket }) => {
           <ul>
             {replies.map((reply) => (
               <li key={reply.id} style={{ listStyleType: "none" }}>
-                <CommentPreview comment={reply} depth={depth + 1} socket={socket} />
+                <CommentPreview comment={reply} socket={socket} />
               </li>
             ))}
           </ul>

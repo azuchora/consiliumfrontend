@@ -5,6 +5,7 @@
   align-items: flex-start;
   border-left: 0.1875rem solid var(--primary-color);
   padding-left: 1rem;
+  padding-top: 0.25rem;
   margin: 0.5rem 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--secondary-color);
@@ -13,6 +14,18 @@
   max-width: 100%;
   width: 100%;
   box-sizing: border-box;
+}
+
+.comments-section {
+  margin-top: 2rem;
+}
+
+.comments-section ul, .comments-section li {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  flex-wrap: wrap;
 }
 
 .comment-preview p {
@@ -30,7 +43,8 @@
   width: 100%;
 }
 
-.comment-preview button {
+.comment-buttons button,
+.load-more-replies-btn {
   margin-top: 0.5rem;
   background: none;
   border: none;
@@ -43,7 +57,8 @@
   align-self: flex-start;
 }
 
-.comment-preview button:hover {
+.comment-buttons button:hover,
+.load-more-replies-btn:hover {
   color: var(--accent-color);
 }
 
@@ -80,6 +95,64 @@
   margin-top: 0.5rem;
 }
 
+.reply-btn {
+  margin-left: 1rem;
+}
+
+.reply-form-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  color: var(--text-color);
+  box-sizing: border-box;
+  overflow-x: auto;
+}
+
+.reply-form-container .add-comment-form {
+  padding-left: 0;
+}
+
+.comment-preview-link {
+  text-decoration: none;
+  color: #666;
+}
+
+.comment-preview-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.comment-preview-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #555;
+  position: relative;
+  overflow: hidden;
+}
+
+.comment-preview-date {
+  font-size: 0.75rem;
+}
+
+.comment-preview-userinfo {
+  font-size: 0.85rem;
+}
+
+.comment-preview-username {
+  color: #666;
+  font-weight: 700;
+}
+
 @media (max-width: 600px) {
   .comment-preview {
     margin-left: 0;
@@ -105,10 +178,4 @@
   }
 }
 
-.reply-btn {
-  margin-left: 1rem;
-}
 
-.reply-form-container {
-  margin-top: 1rem;
-}
