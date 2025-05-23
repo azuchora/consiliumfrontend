@@ -8,7 +8,7 @@ import { faSignInAlt, faUserPlus, faBars, faTimes } from '@fortawesome/free-soli
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const Navbar = () => {
-  const { isAuthed, username, avatar } = useAuth();
+  const { isAuthed, username, avatar, isVerified } = useAuth();
   const logout = useLogout();
   const navigate = useNavigate();
 
@@ -75,6 +75,12 @@ const Navbar = () => {
               </button>
               {dropdownOpen && (
                 <div className="dropdown-menu">
+                  {!isVerified() && (
+                    <button onClick={() => navigate('/verify')} className='dropdown-item'>
+                      Weryfikacja
+                    </button>
+                  )}
+
                   <button onClick={handleLogout} className="dropdown-item">
                     Wyloguj
                   </button>
@@ -98,7 +104,12 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link to='/posts' onClick={toggleMenu}>Forum</Link>
+              {!isVerified() && (
+                <>
+                  <Link to='/posts' onClick={toggleMenu}>Forum</Link>
+                  <Link to='/verify' onClick={toggleMenu}>Weryfikacja</Link>
+                </>    
+              )}
               <button onClick={() => { handleLogout(); toggleMenu(); }}>Wyloguj</button>
             </>
           )}
