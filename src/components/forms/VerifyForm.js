@@ -89,7 +89,7 @@ const VerifyForm = () => {
       });
       
       await refresh();
-      navigate('/home');
+      navigate('/posts');
 
     } catch (err){
       console.log(err)

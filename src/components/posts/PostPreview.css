@@ -3,7 +3,6 @@
   flex-direction: column;
   overflow-wrap: break-word;
   word-break: break-word;
-  opacity: 0;
   box-sizing: border-box;
   margin: 0.75rem;
   padding: 1rem;
@@ -16,13 +15,8 @@
 }
 
 .post-preview-item hr {
-  margin-top: 0.25rem;
+  margin-top: 1rem;
   margin-bottom: 0.25rem;
-}
-
-.post-preview-item.visible {
-  opacity: 1;
-  transform: translateY(0);
 }
 
 .post-preview-link {

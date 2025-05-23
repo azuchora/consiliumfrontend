@@ -21,7 +21,7 @@ const CommentPreview = ({ comment, depth = 0, socket }) => {
   const [isLoadingReplies, setIsLoadingReplies] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
 
-  const isParentComment = comment.comment_id === null;
+  const isParentComment = comment.commentId === null;
 
   const fetchReplies = useCallback(async () => {
     if (!hasMoreReplies || isLoadingReplies) return;
@@ -31,7 +31,7 @@ const CommentPreview = ({ comment, depth = 0, socket }) => {
 
     try {
       const lastTimestamp =
-        replies.length > 0 ? replies[replies.length - 1].created_at : null;
+        replies.length > 0 ? replies[replies.length - 1].createdAt : null;
       const params = lastTimestamp ? { timestamp: lastTimestamp } : {};
 
       const response = await axiosPrivate.get(
@@ -74,7 +74,7 @@ const CommentPreview = ({ comment, depth = 0, socket }) => {
     (newComment) => {
       if (
         isParentComment &&
-        newComment.comment_id === comment.id
+        newComment.commentId === comment.id
       ) {
         setReplies((prev) => {
           if (prev.some((r) => r.id === newComment.id)) {
@@ -106,9 +106,9 @@ const CommentPreview = ({ comment, depth = 0, socket }) => {
       <div className="comment-content">
         <p>{comment.content}</p>
         <div className="comment-meta">
-          <small>Utworzono: {new Date(comment.created_at).toLocaleString()}</small>
+          <small>Utworzono: {new Date(comment.createdAt).toLocaleString()}</small>
           <br />
-          <small>Aktualizacja: {new Date(comment.updated_at).toLocaleString()}</small>
+          <small>Aktualizacja: {new Date(comment.updatedAt).toLocaleString()}</small>
         </div>
 
         {imageFiles.length > 0 && (
@@ -161,7 +161,7 @@ const CommentPreview = ({ comment, depth = 0, socket }) => {
       {isReplying && isParentComment && (
         <div className={`reply-form-container ${!isParentComment ? "child-comment" : ""}`}>
           <AddCommentForm
-            postId={comment.post_id}
+            postId={comment.postId}
             parentCommentId={comment.id}
             onCommentAdded={handleReplyAdded}
           />

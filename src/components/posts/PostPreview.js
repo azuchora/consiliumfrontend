@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { BACKEND_URL } from '../../api/axios';
 import useFormatDate from '../../hooks/useFormatDate';
 import useFileTypeCheck from '../../hooks/useFileTypeCheck';
@@ -9,41 +9,40 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
-const PostPreview = ({ post, visible }) => {
-  const [isVisible, setIsVisible] = useState(false);
+const PostPreview = ({ post, isPage = false }) => {
   const [previewFile, setPreviewFile] = useState(null);
   const formatDate = useFormatDate();
   const { isImage } = useFileTypeCheck();
-
-  useEffect(() => {
-    if (visible) setIsVisible(true);
-  }, [visible]);
 
   const imageFiles = post.files?.filter(file => isImage(file.filename)) || [];
   const otherFiles = post.files?.filter(file => !isImage(file.filename)) || [];
 
   const closePreview = () => setPreviewFile(null);
   
+  if(!post?.id) return null;
+  
+  const authorAvatar = post?.users?.files[0]?.filename;
+
   return (
     <>
-      <section className={`post-preview-item ${isVisible ? 'visible' : ''}`}>
+      <section className="post-preview-item">
         <div className="post-preview-header">
           <div className="post-preview-avatar">
-            <Link to={`users/${post.username}`} className='post-preview-link'>
-              {post?.avatar == null ? 
-                post.username?.[0].toUpperCase()
+            <Link to={`users/${post.users.username}`} className='post-preview-link'>
+              {authorAvatar == null ? 
+                post.users.username?.[0].toUpperCase()
                : (
-                <img src={`${BACKEND_URL}/static/${post.avatar}`} className='post-preview-avatar-img' alt='author avatar'/>
+                <img src={`${BACKEND_URL}/static/${authorAvatar}`} className='post-preview-avatar-img' alt='author avatar'/>
               )}
             </Link>
           </div>
           <div className="post-preview-userinfo">
             <strong className="post-preview-username">
-              <Link to={`users/${post.username}`} className='post-preview-link'>
-                {`${post.name} ${post.surname}`}
+              <Link to={`users/${post.users.username}`} className='post-preview-link'>
+                {`${post?.users.name} ${post.users.surname}`}
               </Link>
             </strong>
-            <div className="post-preview-date">{formatDate(post.created_at)}</div>
+            <div className="post-preview-date">{formatDate(post.createdAt)}</div>
           </div>
         </div>
         <h3 className="post-preview-title">{post.title}</h3>
@@ -93,10 +92,12 @@ const PostPreview = ({ post, visible }) => {
               <FontAwesomeIcon icon={faChevronDown} color='#ff0000' style={{fontSize: '1.125rem'}}/>
             </button>
           </div>
-          <div className='post-preview-comment'>
-            <FontAwesomeIcon icon={faComment} style={{ cursor: 'pointer', fontSize: '1.125rem' }}/>
-            <span>Odpowiedz</span>
-          </div>
+          {!isPage && (
+            <div className='post-preview-comment'>
+              <FontAwesomeIcon icon={faComment} style={{ cursor: 'pointer', fontSize: '1.125rem' }}/>
+              <span>Odpowiedz</span>
+            </div>
+          )}
         </div>
       </section>
 

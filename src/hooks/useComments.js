@@ -40,11 +40,11 @@ const useComments = (postId, socket) => {
   const { isFetching } = useInfiniteScroll({
     fetchData: fetchComments,
     useTimestamp: true,
-    getLastTimestamp: () => comments.length > 0 ? comments[comments.length - 1].created_at : null,
+    getLastTimestamp: () => comments.length > 0 ? comments[comments.length - 1].createdAt : null,
   });
 
   const addComment = useCallback((newComment) => {
-    if (newComment.comment_id != null) return;
+    if (newComment.commentId != null) return;
       
     setComments(prev => {
       if (prev.some(c => c.id === newComment.id)) return prev;
@@ -53,7 +53,7 @@ const useComments = (postId, socket) => {
   }, []);
 
   useSocketEvent("newComment", (newComment) => {
-    if(newComment.post_id === parseInt(postId) && !newComment.comment_id){
+    if(newComment.postId === parseInt(postId) && !newComment.commentId){
       addComment(newComment);
     }
   }, socket);
