@@ -122,12 +122,24 @@
   color: var(--text-color);
 }
 
+@media (max-width: 768px) {
+  .home-container {
+    padding: 0.5rem;
+  } 
+}
+
 @media (max-width: 480px) {
   .home-features {
     display: flex;
     flex-direction: column;
   }
 
+  .home-footer {
+    margin-bottom: 0.75rem;
+  }
+}
+
+@media (max-width: 320px){
   .home-container {
     overflow-wrap: break-word;
     word-break: break-all;

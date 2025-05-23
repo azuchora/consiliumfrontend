@@ -1,8 +1,10 @@
 import './HomePage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComments, faFolderOpen, faShieldAlt } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
+  const navigate = useNavigate();
 
   return (
     <div className="home-container">
@@ -16,6 +18,14 @@ const HomePage = () => {
         <p className="home-hero-text">
           Wymieniaj się wiedzą, pytaj, konsultuj przypadki, ucz się razem z innymi specjalistami.
         </p>
+        <div className="home-buttons">
+            <button
+              className="home-button-primary"
+              onClick={() => navigate('/posts')}
+            >
+              Przejdź do forum
+            </button>
+          </div>
       </section>
 
       <section className="home-features">
