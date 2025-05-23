@@ -1,5 +1,6 @@
 import { createContext, useState } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
+import { ROLES } from '../constants/roles';
 
 const AuthContext = createContext({});
 
@@ -10,9 +11,10 @@ export const AuthProvider = ({ children }) => {
   const [username, setUsername] = useLocalStorage('username', localStorage.getItem('username' || null));
 
   const isAuthed = () => auth?.accessToken ? true : false;
+  const isVerified = () => auth?.roles.includes(ROLES.Verified);
 
   return (
-    <AuthContext.Provider value={{ auth, setAuth, persist, setPersist, isAuthed, setAvatar, setUsername, avatar, username }}>
+    <AuthContext.Provider value={{ auth, setAuth, persist, setPersist, isAuthed, setAvatar, setUsername, avatar, username, isVerified }}>
       {children}
     </AuthContext.Provider>
   )

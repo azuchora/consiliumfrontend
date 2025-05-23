@@ -38,7 +38,7 @@ const PostPage = () => {
 
   return (
     <section className='post-page-container'>
-      <PostPreview post={post} visible />
+      <PostPreview post={post} isPage={true} />
 
       <section className="comments-section">
         <AddCommentForm postId={id} onCommentAdded={addComment} />
@@ -53,7 +53,7 @@ const PostPage = () => {
           ))}
         </ul>
 
-        {isFetching && <Loader />}
+        {isFetching && post?.id && <Loader />}
         {!hasMore && <p>To już wszystkie komentarze.</p>}
         {commentsError && <ErrorMessage message={commentsError} />}
       </section>
