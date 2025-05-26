@@ -1,13 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { LENGTH_LIMITS, USER_REGEX_STR, PASSWORD_REGEX_STR } from '../../constants/validation';
 import { isEmail } from 'validator';
-import FormTextInput from '../inputs/FormTextInput';
-import PasswordInput from '../inputs/PasswordInput';
-import SuccessMessage from '../messages/SuccessMessage';
-import ErrorMessage from '../messages/ErrorMessage';
-import './RegisterForm.css';
 import axios from '../../api/axios';
 import { Link } from 'react-router-dom';
+import { Box, Paper, Typography, Button, TextField, useTheme } from '@mui/material';
+import SuccessMessage from '../messages/SuccessMessage';
+import ErrorMessage from '../messages/ErrorMessage';
 
 const USER_REGEX = new RegExp(USER_REGEX_STR);
 const PASSWORD_REGEX = new RegExp(PASSWORD_REGEX_STR);
@@ -15,45 +13,38 @@ const PASSWORD_REGEX = new RegExp(PASSWORD_REGEX_STR);
 const RegisterForm = () => {
   const userRef = useRef();
   const errRef = useRef();
+  const theme = useTheme();
 
   const [user, setUser] = useState('');
   const [validName, setValidName] = useState(false);
-  const [userFocus, setUserFocus] = useState(false);
 
   const [email, setEmail] = useState('');
   const [validEmail, setValidEmail] = useState(false);
-  const [emailFocus, setEmailFocus] = useState(false);
 
   const [password, setPassword] = useState('');
   const [validPassword, setValidPassword] = useState(false);
-  const [passwordFocus, setPasswordFocus] = useState(false);
 
   const [matchPassword, setMatchPassword] = useState('');
   const [validMatch, setValidMatch] = useState(false);
-  const [matchFocus, setMatchFocus] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState('');
-  const [success, setSuccess] = useState(false);  
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    userRef.current.focus();
+    userRef.current?.focus();
   }, []);
 
   useEffect(() => {
-    const result = USER_REGEX.test(user);
-    setValidName(result);
+    setValidName(USER_REGEX.test(user));
   }, [user]);
 
   useEffect(() => {
-    const result = isEmail(email);
-    setValidEmail(result);
+    setValidEmail(isEmail(email));
   }, [email]);
 
   useEffect(() => {
-    const result = PASSWORD_REGEX.test(password);
-    setValidPassword(result);
-    const match = password === matchPassword;
-    setValidMatch(match);
+    setValidPassword(PASSWORD_REGEX.test(password));
+    setValidMatch(password === matchPassword);
   }, [password, matchPassword]);
 
   useEffect(() => {
@@ -66,115 +57,251 @@ const RegisterForm = () => {
     const v1 = USER_REGEX.test(user);
     const v2 = PASSWORD_REGEX.test(password);
     const v3 = isEmail(email);
-    if(!v1 || !v2 || !v3){
-      setErrorMessage('Nieprawidłowe dane.')
+    if (!v1 || !v2 || !v3) {
+      setErrorMessage('Nieprawidłowe dane.');
       return;
     }
 
     try {
-      const response = await axios.post(
-        '/register', 
-        JSON.stringify({ username: user, email, password}),
+      await axios.post(
+        '/register',
+        JSON.stringify({ username: user, email, password }),
         {
-          headers: { 'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           withCredentials: true
         }
       );
-      console.log(response.data); 
       setSuccess(true);
-    } catch (err){
-      if(!err?.response){
+    } catch (err) {
+      if (!err?.response) {
         setErrorMessage('Nie można połączyć się z serwerem.');
-      } else if (err.response?.status === 409){
+      } else if (err.response?.status === 409) {
         setErrorMessage('Nazwa uzytkownika lub email jest już w użyciu.');
       } else {
         setErrorMessage('Błąd rejestracji.');
       }
-      errRef.current.focus();
+      errRef.current?.focus();
     }
-  }
-  
+  };
+
   return (
     <>
       {success ? (
-        <SuccessMessage/>
+        <SuccessMessage />
       ) : (
-      <section className='register-form-container'>
-        <ErrorMessage message={errorMessage} errRef={errRef}/>
-        <h1 className='register-form-title'>Rejestracja</h1>
-        <form className='register-form' onSubmit={handleSubmit}>
-          <FormTextInput
-            label='Nazwa użytkownika'
-            id='username'
-            ref={userRef}
-            value={user}
-            onChange={(e) => setUser(e.target.value)}
-            isValid={validName}
-            isFocused={userFocus}
-            onFocus={() => setUserFocus(true)}
-            onBlur={() => setUserFocus(false)}
-            cName='register-form'
-            helperText={
-              `Od ${LENGTH_LIMITS.USERNAME_MIN} do ${LENGTH_LIMITS.USERNAME_MAX} znaków.` +
-              'Litery, cyfry, podkreślniki, myślniki są dozwolone.'}
-          />
-
-          <FormTextInput 
-            label='Adres e-mail:'
-            id='email'
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            isValid={validEmail}
-            isFocused={emailFocus}
-            onFocus={() => setEmailFocus(true)}
-            onBlur={() => setEmailFocus(false)}
-            cName='register-form'
-            helperText='Wprowadź poprawny adres e-mail (np. przykład@domena.pl).'
-          />
-
-          <PasswordInput
-            label='Hasło:'
-            id='password'
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            isValid={validPassword}
-            isFocused={passwordFocus}
-            onFocus={() => setPasswordFocus(true)}
-            onBlur={() => setPasswordFocus(false)}
-            helperText={
-              `Od ${LENGTH_LIMITS.PASSWORD_MIN} do ${LENGTH_LIMITS.PASSWORD_MAX} znaków. ` +
-              'Musi zawierać dużą i małą literę, cyfrę i znak specjalny (!@#$%).'
-            }
-          />
-
-          <PasswordInput
-            label='Powtórz hasło:'
-            id='confirm-password'
-            value={matchPassword}
-            onChange={(e) => setMatchPassword(e.target.value)}
-            isValid={validMatch && validPassword}
-            isFocused={matchFocus}
-            onFocus={() => setMatchFocus(true)}
-            onBlur={() => setMatchFocus(false)}
-            helperText='Musi być zgodne z pierwszym polem hasła.'
-          />
-
-          <button 
-            className='register-form-btn'
-            disabled={!validName || !validEmail || !validPassword || !validMatch ? true : false}
+        <Box
+          sx={{
+            width: '100%',
+            maxWidth: 400,
+            mx: 'auto',
+            mt: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Paper
+            elevation={3}
+            sx={{
+              width: '100%',
+              p: { xs: 2, sm: 4 },
+              borderRadius: 3,
+              background: theme.palette.background.default,
+              border: `1.5px solid ${theme.palette.primary.main}`,
+              boxShadow: '0 2px 12px 0 rgba(42,63,84,0.07)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
           >
-            Zarejestruj się
-          </button>
-          <p className='register-form-login'>
-            Masz już konto?
-            <br />
-            <Link to='/login' className='register-form-link'>Zaloguj się</Link>
-          </p>
-        </form>
-      </section>
-    )}
+            <ErrorMessage message={errorMessage} errRef={errRef} />
+            <Typography
+              variant="h5"
+              sx={{
+                mb: 2,
+                fontWeight: 700,
+                color: theme.palette.primary.main,
+                textAlign: 'center',
+              }}
+            >
+              Rejestracja
+            </Typography>
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+                width: '100%',
+              }}
+            >
+              <TextField
+                label="Nazwa użytkownika"
+                id="username"
+                inputRef={userRef}
+                value={user}
+                onChange={(e) => setUser(e.target.value)}
+                error={user && !validName}
+                helperText={
+                  user && !validName
+                    ? `Od ${LENGTH_LIMITS.USERNAME_MIN} do ${LENGTH_LIMITS.USERNAME_MAX} znaków. Litery, cyfry, podkreślniki, myślniki są dozwolone.`
+                    : ' '
+                }
+                fullWidth
+                autoComplete="off"
+                required
+                variant="outlined"
+                sx={{
+                  bgcolor: "#fff",
+                  borderRadius: 1,
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: theme.palette.primary.main,
+                    },
+                    "&:hover fieldset": {
+                      borderColor: theme.palette.secondary.main,
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: theme.palette.secondary.main,
+                    },
+                  },
+                }}
+              />
+
+              <TextField
+                label="Adres e-mail"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                error={email && !validEmail}
+                helperText={
+                  email && !validEmail
+                    ? 'Wprowadź poprawny adres e-mail (np. przykład@domena.pl).'
+                    : ' '
+                }
+                fullWidth
+                autoComplete="off"
+                required
+                variant="outlined"
+                sx={{
+                  bgcolor: "#fff",
+                  borderRadius: 1,
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: theme.palette.primary.main,
+                    },
+                    "&:hover fieldset": {
+                      borderColor: theme.palette.secondary.main,
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: theme.palette.secondary.main,
+                    },
+                  },
+                }}
+              />
+
+              <TextField
+                label="Hasło"
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                error={password && !validPassword}
+                helperText={
+                  password && !validPassword
+                    ? `Od ${LENGTH_LIMITS.PASSWORD_MIN} do ${LENGTH_LIMITS.PASSWORD_MAX} znaków. Musi zawierać dużą i małą literę, cyfrę i znak specjalny (!@#$%).`
+                    : ' '
+                }
+                fullWidth
+                autoComplete="new-password"
+                required
+                variant="outlined"
+                sx={{
+                  bgcolor: "#fff",
+                  borderRadius: 1,
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: theme.palette.primary.main,
+                    },
+                    "&:hover fieldset": {
+                      borderColor: theme.palette.secondary.main,
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: theme.palette.secondary.main,
+                    },
+                  },
+                }}
+              />
+
+              <TextField
+                label="Powtórz hasło"
+                id="confirm-password"
+                type="password"
+                value={matchPassword}
+                onChange={(e) => setMatchPassword(e.target.value)}
+                error={matchPassword && (!validMatch || !validPassword)}
+                helperText={
+                  matchPassword && (!validMatch || !validPassword)
+                    ? 'Musi być zgodne z pierwszym polem hasła.'
+                    : ' '
+                }
+                fullWidth
+                autoComplete="new-password"
+                required
+                variant="outlined"
+                sx={{
+                  bgcolor: "#fff",
+                  borderRadius: 1,
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: theme.palette.primary.main,
+                    },
+                    "&:hover fieldset": {
+                      borderColor: theme.palette.secondary.main,
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: theme.palette.secondary.main,
+                    },
+                  },
+                }}
+              />
+
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={!validName || !validEmail || !validPassword || !validMatch}
+                sx={{
+                  bgcolor: theme.palette.primary.main,
+                  color: "#fff",
+                  fontWeight: 700,
+                  borderRadius: 2,
+                  py: 1.2,
+                  fontSize: "1rem",
+                  mt: 1,
+                  "&:hover": {
+                    bgcolor: theme.palette.secondary.main,
+                    color: "#fff",
+                  },
+                }}
+              >
+                Zarejestruj się
+              </Button>
+              <Typography
+                variant="body2"
+                sx={{ mt: 2, textAlign: 'center', color: theme.palette.text.secondary }}
+              >
+                Masz już konto?{' '}
+                <Link to="/login" style={{ color: theme.palette.primary.main, fontWeight: 600 }}>
+                  Zaloguj się
+                </Link>
+              </Typography>
+            </Box>
+          </Paper>
+        </Box>
+      )}
     </>
-  )
-}
+  );
+};
 
 export default RegisterForm;

@@ -2,8 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { PESEL_REGEX, NAME_REGEX, SURNAME_REGEX, PWZ_REGEX } from '../../constants/validation';
 import ErrorMessage from '../messages/ErrorMessage';
 import { Link, useNavigate } from 'react-router-dom';
-import './VerifyForm.css';
-import FormTextInput from '../inputs/FormTextInput';
+import { Box, Paper, Typography, Button, TextField, Divider, useTheme } from '@mui/material';
 import useLogout from '../../hooks/useLogout';
 import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 import useRefreshToken from '../../hooks/useRefreshToken';
@@ -13,55 +12,48 @@ const VerifyForm = () => {
   const logout = useLogout();
   const axiosPrivate = useAxiosPrivate();
   const refresh = useRefreshToken();
+  const theme = useTheme();
 
   const signOut = async () => {
     await logout();
     navigate('/login');
-  }
+  };
 
   const nameRef = useRef();
   const errRef = useRef();
 
   const [name, setName] = useState('');
   const [validName, setValidName] = useState(false);
-  const [nameFocus, setNameFocus] = useState(false);
 
   const [surname, setSurname] = useState('');
   const [validSurname, setValidSurname] = useState(false);
-  const [surnameFocus, setSurnameFocus] = useState(false);
 
   const [pesel, setPesel] = useState('');
   const [validPesel, setValidPesel] = useState(false);
-  const [peselFocus, setPeselFocus] = useState(false);
 
   const [pwz, setPwz] = useState('');
   const [validPwz, setValidPwz] = useState(false);
-  const [pwzFocus, setPwzFocus] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    nameRef.current.focus();
+    nameRef.current?.focus();
   }, []);
 
   useEffect(() => {
-    const result = NAME_REGEX.test(name);
-    setValidName(result);
+    setValidName(NAME_REGEX.test(name));
   }, [name]);
 
   useEffect(() => {
-    const result = SURNAME_REGEX.test(surname);
-    setValidSurname(result);
+    setValidSurname(SURNAME_REGEX.test(surname));
   }, [surname]);
 
   useEffect(() => {
-    const result = PESEL_REGEX.test(pesel);
-    setValidPesel(result);
+    setValidPesel(PESEL_REGEX.test(pesel));
   }, [pesel]);
 
   useEffect(() => {
-    const result = PWZ_REGEX.test(pwz);
-    setValidPwz(result);
+    setValidPwz(PWZ_REGEX.test(pwz));
   }, [pwz]);
 
   useEffect(() => {
@@ -70,110 +62,233 @@ const VerifyForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const v1 = NAME_REGEX.test(name);
     const v2 = PESEL_REGEX.test(pesel);
     const v3 = SURNAME_REGEX.test(surname);
     const v4 = PWZ_REGEX.test(pwz);
-    if(!v1 || !v2 || !v3 || !v4){
-      setErrorMessage('Nieprawidłowe dane.')
+    if (!v1 || !v2 || !v3 || !v4) {
+      setErrorMessage('Nieprawidłowe dane.');
       return;
     }
 
     try {
-      await axiosPrivate.post('/verify', { 
-        name, 
-        surname, 
+      await axiosPrivate.post('/verify', {
+        name,
+        surname,
         pesel,
         pwz
       });
-      
+
       await refresh();
       navigate('/posts');
-
-    } catch (err){
-      console.log(err)
-      if(!err?.response){
+    } catch (err) {
+      if (!err?.response) {
         setErrorMessage('Nie można połączyć się z serwerem.');
-      } else if (err.response?.status === 404){
+      } else if (err.response?.status === 404) {
         setErrorMessage('Nie można zweryfikować użytkownika.');
       } else {
         setErrorMessage('Błąd weryfikacji użytkownika.');
       }
-      errRef.current.focus();
+      errRef.current?.focus();
     }
-  }
-  
+  };
+
   return (
-    <section className='verify-form-container'>
-      <ErrorMessage message={errorMessage} errRef={errRef}/>
-      <h1 className='verify-form-title'>Weryfikacja</h1>
-      <form className='verify-form' onSubmit={handleSubmit}>
-  
-        <FormTextInput
-          label='Imie:'
-          id='name'
-          cName='verify-form'
-          ref={nameRef}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          isValid={validName}
-          isFocused={nameFocus}
-          onFocus={() => setNameFocus(true)}
-          onBlur={() => setNameFocus(false)}
-          helperText='Wprowadź poprawne imie.'
-        />
-
-        <FormTextInput 
-          label='Nazwisko:'
-          id='surname'
-          cName='register-form'
-          value={surname}
-          onChange={(e) => setSurname(e.target.value)}
-          isValid={validSurname}
-          isFocused={surnameFocus}
-          onFocus={() => setSurnameFocus(true)}
-          onBlur={() => setSurnameFocus(false)}
-          helperText='Wprowadź poprawne nazwisko.'
-        />
-
-        <FormTextInput
-          label='Numer PESEL:'
-          id='pesel'
-          cName='register-form'
-          value={pesel}
-          onChange={(e) => setPesel(e.target.value)}
-          isValid={validPesel}
-          isFocused={peselFocus}
-          onFocus={() => setPeselFocus(true)}
-          onBlur={() => setPeselFocus(false)}
-          helperText='Wprowadź 11-cyfrowy numer PESEL.'
-        />
-
-        <FormTextInput
-          label='Numer PWZ:'
-          id='pwz'
-          value={pwz}
-          cName='register-form'
-          onChange={(e) => setPwz(e.target.value)}
-          isValid={validPwz}
-          isFocused={pwzFocus}
-          onFocus={() => setPwzFocus(true)}
-          onBlur={() => setPwzFocus(false)}
-          helperText='Wprowadź 7-cyfrowy numer PWZ.'
-        />
-
-        <button 
-          className='verify-form-btn'
-          disabled={!validName || !validSurname || !validPesel || !validPwz ? true : false}
+    <Box
+      sx={{
+        width: '100%',
+        maxWidth: 400,
+        mx: 'auto',
+        mt: 6,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{
+          width: '100%',
+          p: { xs: 2, sm: 4 },
+          borderRadius: 3,
+          background: theme.palette.background.default,
+          border: `1.5px solid ${theme.palette.primary.main}`,
+          boxShadow: '0 2px 12px 0 rgba(42,63,84,0.07)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <ErrorMessage message={errorMessage} errRef={errRef} />
+        <Typography
+          variant="h5"
+          sx={{
+            mb: 2,
+            fontWeight: 700,
+            color: theme.palette.primary.main,
+            textAlign: 'center',
+          }}
         >
-          Zweryfikuj
-        </button>
-        
-        <Link className='verify-form-link' onClick={() => signOut()}>Wyloguj się</Link>
-      </form>
-    </section>
-  )
-}
+          Weryfikacja
+        </Typography>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            width: '100%',
+          }}
+        >
+          <TextField
+            label="Imię"
+            id="name"
+            inputRef={nameRef}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            error={name && !validName}
+            helperText={name && !validName ? 'Wprowadź poprawne imię.' : ' '}
+            fullWidth
+            required
+            variant="outlined"
+            sx={{
+              bgcolor: "#fff",
+              borderRadius: 1,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: theme.palette.primary.main,
+                },
+                "&:hover fieldset": {
+                  borderColor: theme.palette.secondary.main,
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: theme.palette.secondary.main,
+                },
+              },
+            }}
+          />
+
+          <TextField
+            label="Nazwisko"
+            id="surname"
+            value={surname}
+            onChange={(e) => setSurname(e.target.value)}
+            error={surname && !validSurname}
+            helperText={surname && !validSurname ? 'Wprowadź poprawne nazwisko.' : ' '}
+            fullWidth
+            required
+            variant="outlined"
+            sx={{
+              bgcolor: "#fff",
+              borderRadius: 1,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: theme.palette.primary.main,
+                },
+                "&:hover fieldset": {
+                  borderColor: theme.palette.secondary.main,
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: theme.palette.secondary.main,
+                },
+              },
+            }}
+          />
+
+          <TextField
+            label="Numer PESEL"
+            id="pesel"
+            value={pesel}
+            onChange={(e) => setPesel(e.target.value)}
+            error={pesel && !validPesel}
+            helperText={pesel && !validPesel ? 'Wprowadź 11-cyfrowy numer PESEL.' : ' '}
+            fullWidth
+            required
+            variant="outlined"
+            sx={{
+              bgcolor: "#fff",
+              borderRadius: 1,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: theme.palette.primary.main,
+                },
+                "&:hover fieldset": {
+                  borderColor: theme.palette.secondary.main,
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: theme.palette.secondary.main,
+                },
+              },
+            }}
+          />
+
+          <TextField
+            label="Numer PWZ"
+            id="pwz"
+            value={pwz}
+            onChange={(e) => setPwz(e.target.value)}
+            error={pwz && !validPwz}
+            helperText={pwz && !validPwz ? 'Wprowadź 7-cyfrowy numer PWZ.' : ' '}
+            fullWidth
+            required
+            variant="outlined"
+            sx={{
+              bgcolor: "#fff",
+              borderRadius: 1,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: theme.palette.primary.main,
+                },
+                "&:hover fieldset": {
+                  borderColor: theme.palette.secondary.main,
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: theme.palette.secondary.main,
+                },
+              },
+            }}
+          />
+
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={!validName || !validSurname || !validPesel || !validPwz}
+            sx={{
+              bgcolor: theme.palette.primary.main,
+              color: "#fff",
+              fontWeight: 700,
+              borderRadius: 2,
+              py: 1.2,
+              fontSize: "1rem",
+              mt: 1,
+              "&:hover": {
+                bgcolor: theme.palette.secondary.main,
+                color: "#fff",
+              },
+            }}
+            fullWidth
+          >
+            Zweryfikuj
+          </Button>
+        </Box>
+        <Divider sx={{ width: '100%', my: 2, borderColor: theme.palette.primary.light, opacity: 0.5 }} />
+        <Link
+          onClick={signOut}
+          style={{
+            color: theme.palette.primary.main,
+            fontWeight: 600,
+            textAlign: 'center',
+            cursor: 'pointer',
+            marginTop: 8,
+          }}
+        >
+          Wyloguj się
+        </Link>
+      </Paper>
+    </Box>
+  );
+};
 
 export default VerifyForm;

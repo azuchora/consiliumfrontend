@@ -1,16 +1,34 @@
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
-import './Layout.css';
+import Footer from './Footer';
+import { Box } from '@mui/material';
 
 const Layout = () => {
   return (
-    <main className='App'>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        width: '100%',
+        maxWidth: '100%',
+        bgcolor: 'background.default',
+      }}
+    >
       <Navbar />
-      <section className='app-content'>
+      <Box
+        component="section"
+        sx={{
+          width: '100%',
+          flexGrow: 1,
+          boxSizing: 'border-box',
+        }}
+      >
         <Outlet />
-      </section>
-    </main>
-  )
-}
+      </Box>
+      <Footer />
+    </Box>
+  );
+};
 
 export default Layout;

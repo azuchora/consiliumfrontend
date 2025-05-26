@@ -1,43 +1,52 @@
 import { useState, useCallback } from 'react';
 import useAxiosPrivate from './useAxiosPrivate';
 
-const usePostsFetcher = () => {
+const usePostsFetcher = (filters = {}) => {
   const [posts, setPosts] = useState([]);
   const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const axiosPrivate = useAxiosPrivate();
 
-  const fetchPosts = useCallback(
-    async (timestamp) => {
-      if (!hasMore) return;
-
+  const fetchPosts = useCallback(async (timestamp = null, reset = false) => {
       try {
-        const params = timestamp ? { timestamp } : {};
+        setIsLoading(true);
+        console.log("Fetching posts with timestamp:", timestamp);
+        const params = {
+          ...(timestamp && { timestamp }),
+          ...filters,
+        };
+
         const response = await axiosPrivate.get('/posts', { params });
+
         const newPosts = response.data.posts || [];
         const pagination = response.data.pagination || {};
+        console.log(pagination);
 
         setPosts((prevPosts) => {
+          if (reset) {
+            return newPosts;
+          }
           const existingIds = new Set(prevPosts.map((p) => p.id));
           const uniqueNewPosts = newPosts.filter((p) => !existingIds.has(p.id));
-
           return [...prevPosts, ...uniqueNewPosts];
         });
 
-        if (pagination.hasMore === false || newPosts.length === 0) {
-          setHasMore(false);
-        }
+        setHasMore(pagination.hasMore && newPosts.length > 0);
       } catch (err) {
-        if (err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED') {
-          console.log('Request canceled:', err.message);
-        } else {
-          console.error('Fetch posts error:', err);
-        }
+        console.error('Fetch posts error:', err);
+      } finally {
+        setIsLoading(false);
       }
     },
-    [axiosPrivate, hasMore]
+    [axiosPrivate, filters]
   );
 
-  return { posts, hasMore, fetchPosts };
+  const resetPosts = useCallback(() => {
+    setPosts([]);
+    setHasMore(true);
+  }, []);
+
+  return { posts, hasMore, isLoading, fetchPosts, resetPosts, setPosts };
 };
 
 export default usePostsFetcher;
