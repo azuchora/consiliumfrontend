@@ -12,30 +12,56 @@ const Footer = () => {
         color: '#fff',
         textAlign: 'center',
         mt: 'auto',
+        maxWidth: '100vw',
       }}
     >
-      <Typography variant="body2" sx={{ mb: 1 }}>
+      <Typography variant="body2" sx={{ mb: 1, px: 1 }}>
         &copy; 2025 CONSILIUM. Wszelkie prawa zastrzeżone.
       </Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          gap: 2,
+          px: 1,
+          width: '100%',
+          boxSizing: 'border-box',
+        }}
+      >
         <Link
           href="/privacy"
           underline="hover"
-          sx={{ color: '#fff', fontSize: '0.9rem', fontWeight: 500 }}
+          sx={{
+            color: '#fff',
+            fontSize: '0.9rem',
+            fontWeight: 500,
+            whiteSpace: 'nowrap',
+          }}
         >
           Polityka prywatności
         </Link>
         <Link
           href="/terms"
           underline="hover"
-          sx={{ color: '#fff', fontSize: '0.9rem', fontWeight: 500 }}
+          sx={{
+            color: '#fff',
+            fontSize: '0.9rem',
+            fontWeight: 500,
+            whiteSpace: 'nowrap',
+          }}
         >
           Regulamin
         </Link>
         <Link
           href="/contact"
           underline="hover"
-          sx={{ color: '#fff', fontSize: '0.9rem', fontWeight: 500 }}
+          sx={{
+            color: '#fff',
+            fontSize: '0.9rem',
+            fontWeight: 500,
+            whiteSpace: 'nowrap',
+          }}
         >
           Kontakt
         </Link>

@@ -8,7 +8,6 @@ import {
   ListItem,
   Paper,
   IconButton,
-  Tooltip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import usePost from "../hooks/usePost";
@@ -63,24 +62,19 @@ const PostPage = () => {
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 }, mb: 4, position: "relative" }}>
-        <Tooltip title="Wróć">
-          <IconButton
-            onClick={() => navigate(-1)}
-            sx={{
-              position: "absolute",
-              top: { xs: 8, sm: 16 },
-              left: { xs: 8, sm: 16 },
-              zIndex: 2,
-              bgcolor: "background.paper",
-              boxShadow: 1,
-              "&:hover": { bgcolor: "grey.100" },
-            }}
-            aria-label="Wróć"
-          >
-            <ArrowBackIcon />
-          </IconButton>
-        </Tooltip>
+      <Box sx={{ mb: 1 }}>
+        <IconButton
+          onClick={() => navigate(-1)}
+          sx={{
+            color: "primary.main",
+            mb: 1,
+          }}
+          aria-label="Powrót"
+        >
+          <ArrowBackIcon />
+        </IconButton>
+      </Box>
+      <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 }, mb: 4 }}>
         <PostPreview post={post} isPage={true} />
       </Paper>
       <Paper elevation={2} sx={{ p: { xs: 2, sm: 4 } }}>

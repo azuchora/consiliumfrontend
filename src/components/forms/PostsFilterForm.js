@@ -7,6 +7,7 @@ import {
   InputLabel,
   FormControl,
   useMediaQuery,
+  Stack,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useTheme } from "@mui/material/styles";
@@ -21,7 +22,7 @@ const PostFilterForm = ({ handleSearchSubmit, handleInputChange, filters }) => {
       onSubmit={handleSearchSubmit}
       sx={{
         display: "flex",
-        flexWrap: "wrap",
+        flexDirection: "column",
         gap: 2,
         mb: 3,
         p: 2,
@@ -36,90 +37,116 @@ const PostFilterForm = ({ handleSearchSubmit, handleInputChange, filters }) => {
         boxSizing: "border-box",
       }}
     >
-      <TextField
-        name="search"
-        label="Szukaj słów kluczowych"
-        value={filters.search}
-        onChange={handleInputChange}
-        size="small"
+      <Stack
+        direction="row"
+        flexWrap="wrap"
+        gap={2}
         sx={{
-          minWidth: isMobile ? "100%" : 180,
-          flex: 1,
-          maxWidth: isMobile ? "100%" : 220,
-        }}
-        autoComplete="off"
-      />
-
-      <FormControl size="small" sx={{
-        minWidth: isMobile ? "100%" : 140,
-        flex: 1,
-        maxWidth: isMobile ? "100%" : 180,
-      }}>
-        <InputLabel id="post-status-label">Status</InputLabel>
-        <Select
-          labelId="post-status-label"
-          name="postStatusId"
-          value={filters.postStatusId}
-          label="Status"
-          onChange={handleInputChange}
-        >
-          <MenuItem value="">Wszystkie statusy</MenuItem>
-          <MenuItem value="1">Pilne</MenuItem>
-          <MenuItem value="2">OK</MenuItem>
-          <MenuItem value="3">Inne</MenuItem>
-        </Select>
-      </FormControl>
-
-      <TextField
-        name="age"
-        label="Wiek pacjenta"
-        type="number"
-        value={filters.age}
-        onChange={handleInputChange}
-        size="small"
-        inputProps={{ min: 1, max: 125 }}
-        sx={{
-          minWidth: isMobile ? "100%" : 120,
-          flex: 1,
-          maxWidth: isMobile ? "100%" : 140,
-        }}
-      />
-
-      <FormControl size="small" sx={{
-        minWidth: isMobile ? "100%" : 120,
-        flex: 1,
-        maxWidth: isMobile ? "100%" : 140,
-      }}>
-        <InputLabel id="gender-label">Płeć</InputLabel>
-        <Select
-          labelId="gender-label"
-          name="gender"
-          value={filters.gender}
-          label="Płeć"
-          onChange={handleInputChange}
-        >
-          <MenuItem value="">Wszystkie</MenuItem>
-          <MenuItem value="male">Mężczyzna</MenuItem>
-          <MenuItem value="female">Kobieta</MenuItem>
-        </Select>
-      </FormControl>
-
-      <Button
-        type="submit"
-        variant="contained"
-        color="primary"
-        startIcon={<SearchIcon />}
-        sx={{
-          minWidth: isMobile ? "100%" : 120,
-          flex: 1,
-          height: 40,
-          fontWeight: 600,
-          boxShadow: "0 2px 8px rgba(60,72,88,0.07)",
-          maxWidth: isMobile ? "100%" : 140,
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        Szukaj
-      </Button>
+        <TextField
+          name="search"
+          label="Szukaj słów kluczowych"
+          value={filters.search}
+          onChange={handleInputChange}
+          size="small"
+          sx={{
+            minWidth: isMobile ? "100%" : 180,
+            flex: 1,
+            maxWidth: isMobile ? "100%" : 220,
+          }}
+          autoComplete="off"
+        />
+
+        <TextField
+          name="username"
+          label="Nazwa użytkownika"
+          value={filters.username}
+          onChange={handleInputChange}
+          size="small"
+          inputProps={{ min: 1, max: 125 }}
+          sx={{
+            minWidth: isMobile ? "100%" : 120,
+            flex: 1,
+            maxWidth: isMobile ? "100%" : 140,
+          }}
+        />
+
+        <FormControl size="small" sx={{
+          minWidth: isMobile ? "100%" : 140,
+          flex: 1,
+          maxWidth: isMobile ? "100%" : 180,
+        }}>
+          <InputLabel id="post-status-label">Status</InputLabel>
+          <Select
+            labelId="post-status-label"
+            name="postStatusId"
+            value={filters.postStatusId}
+            label="Status"
+            onChange={handleInputChange}
+            MenuProps={{ disableScrollLock: true }}
+          >
+            <MenuItem value="">Wszystkie statusy</MenuItem>
+            <MenuItem value="1">Pilne</MenuItem>
+            <MenuItem value="2">OK</MenuItem>
+            <MenuItem value="3">Inne</MenuItem>
+          </Select>
+        </FormControl>
+
+        <TextField
+          name="age"
+          label="Wiek pacjenta"
+          type="number"
+          value={filters.age}
+          onChange={handleInputChange}
+          size="small"
+          inputProps={{ min: 1, max: 125 }}
+          sx={{
+            minWidth: isMobile ? "100%" : 120,
+            flex: 1,
+            maxWidth: isMobile ? "100%" : 140,
+          }}
+        />
+
+        <FormControl size="small" sx={{
+          minWidth: isMobile ? "100%" : 120,
+          flex: 1,
+          maxWidth: isMobile ? "100%" : 140,
+        }}>
+          <InputLabel id="gender-label">Płeć</InputLabel>
+          <Select
+            labelId="gender-label"
+            name="gender"
+            value={filters.gender}
+            label="Płeć"
+            onChange={handleInputChange}
+            MenuProps={{ disableScrollLock: true }}
+          >
+            <MenuItem value="">Wszystkie</MenuItem>
+            <MenuItem value="male">Mężczyzna</MenuItem>
+            <MenuItem value="female">Kobieta</MenuItem>
+          </Select>
+        </FormControl>
+      </Stack>
+      <Box sx={{ width: isMobile ? "100%" : 180 }}>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          startIcon={<SearchIcon />}
+          sx={{
+            width: "100%",
+            height: 40,
+            fontWeight: 600,
+            boxShadow: "0 2px 8px rgba(60,72,88,0.07)",
+          }}
+        >
+          Szukaj
+        </Button>
+      </Box>
     </Box>
   );
 };

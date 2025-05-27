@@ -167,7 +167,13 @@ const AddCommentForm = ({ postId, parentCommentId = null, onCommentAdded }) => {
                       }}
                     />
                   )}
-                  <Typography variant="body2" sx={{ color: theme.palette.text.primary }}>
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      color: theme.palette.text.primary,
+                      wordBreak: "break-all" 
+                    }}
+                  >
                     {file.name} ({(file.size / 1024).toFixed(1)} KB)
                   </Typography>
                 </ListItem>

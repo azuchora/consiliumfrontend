@@ -39,12 +39,13 @@ const HomePage = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        width: '100vw',
         bgcolor: theme.palette.primary.light,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         py: { xs: 2, sm: 4 },
+        width: '100%',
+        overflowX: 'hidden',
       }}
     >
       <Container
@@ -54,10 +55,12 @@ const HomePage = () => {
           borderRadius: 4,
           boxShadow: theme.shadows[4],
           py: { xs: 2, sm: 4 },
-          px: { xs: 1, sm: 4 },
+          px: { xs: 0.5, sm: 4 },
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          width: '100%',
+          overflowX: 'hidden',
         }}
       >
         <Paper
@@ -71,6 +74,7 @@ const HomePage = () => {
             textAlign: 'center',
             width: '100%',
             boxShadow: theme.shadows[6],
+            overflowX: 'hidden',
           }}
         >
           <Typography
@@ -82,6 +86,7 @@ const HomePage = () => {
               mb: 1,
               color: '#fff',
               width: '100%',
+              overflowWrap: 'break-word',
             }}
           >
             CONSILIUM
@@ -93,6 +98,7 @@ const HomePage = () => {
               fontSize: { xs: '1.1rem', sm: '1.3rem' },
               color: 'rgba(255,255,255,0.85)',
               width: '100%',
+              overflowWrap: 'break-word',
             }}
           >
             Forum dyskusyjne dla lekarzy
@@ -109,6 +115,7 @@ const HomePage = () => {
             background: theme.palette.background.default,
             width: '100%',
             boxShadow: theme.shadows[2],
+            overflowX: 'hidden',
           }}
         >
           <Typography
@@ -119,6 +126,7 @@ const HomePage = () => {
               mb: 2,
               fontSize: { xs: '1.3rem', sm: '2rem' },
               width: '100%',
+              overflowWrap: 'break-word',
             }}
           >
             Witamy w CONSILIUM
@@ -130,6 +138,7 @@ const HomePage = () => {
               color: theme.palette.text.secondary,
               mb: 3,
               width: '100%',
+              overflowWrap: 'break-word',
             }}
           >
             Wymieniaj się wiedzą, pytaj, konsultuj przypadki, ucz się razem z innymi specjalistami.
@@ -164,18 +173,24 @@ const HomePage = () => {
             mb: 4,
             width: '100%',
             justifyContent: 'center',
+            overflowX: 'hidden',
+            margin: 0,
           }}
           columns={{ xs: 1, md: 2 }}
         >
           {features.map((feature, idx) => (
             <Grid
               key={feature.title}
+              item
+              xs={12}
+              md={6}
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gridColumn: { xs: 'span 1', md: 'span 1' },
-                maxWidth: { xs: '100%', md: '50%' },
+                maxWidth: { xs: '100%', md: 380 },
+                width: '100%',
+                px: { xs: 0, sm: 1 },
               }}
             >
               <Paper
@@ -194,6 +209,7 @@ const HomePage = () => {
                   minHeight: 220,
                   justifyContent: 'center',
                   mx: 'auto',
+                  overflowX: 'hidden',
                 }}
               >
                 <FontAwesomeIcon
@@ -212,6 +228,7 @@ const HomePage = () => {
                     mb: 1,
                     textAlign: 'center',
                     width: '100%',
+                    overflowWrap: 'break-word',
                   }}
                 >
                   {feature.title}
@@ -222,6 +239,7 @@ const HomePage = () => {
                     color: theme.palette.text.secondary,
                     textAlign: 'center',
                     width: '100%',
+                    overflowWrap: 'break-word',
                   }}
                 >
                   {feature.text}

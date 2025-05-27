@@ -174,7 +174,7 @@ const PostsFeed = () => {
                 </Box>
               )
             }
-            scrollThreshold={0.95}
+            scrollThreshold={0.90}
           >
             <List sx={{ width: '100%' }}>
               {posts.length === 0 && !isLoading ? (

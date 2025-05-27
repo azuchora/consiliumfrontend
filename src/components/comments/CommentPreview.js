@@ -9,6 +9,9 @@ import {
   Paper,
   Stack,
   useTheme,
+  IconButton,
+  Tooltip,
+  useMediaQuery,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
@@ -20,6 +23,9 @@ import useFileTypeCheck from "../../hooks/useFileTypeCheck";
 import useSocketEvent from "../../hooks/useSocketEvent";
 import AddCommentForm from "../forms/AddCommentForm";
 import useFormatDate from "../../hooks/useFormatDate";
+import useAuth from "../../hooks/useAuth";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronUp, faChevronDown, faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
 
 const CommentPreview = ({ comment, socket }) => {
   const axiosPrivate = useAxiosPrivate();
@@ -33,48 +39,52 @@ const CommentPreview = ({ comment, socket }) => {
   const [isReplying, setIsReplying] = useState(false);
   const formatDate = useFormatDate();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { auth } = useAuth();
+  const currentUserId = auth?.id;
+
+  // Voting logic for comments
+  const initialTotalVotes = comment.comment_votes?.reduce((sum, v) => sum + v.value, 0) || 0;
+  const initialUserVote = comment.comment_votes?.find(v => v.userId === currentUserId)?.value || 0;
+  const [vote, setVote] = useState(initialUserVote);
+  const [voteCount, setVoteCount] = useState(initialTotalVotes);
+  const [loadingVote, setLoadingVote] = useState(false);
+
+  // Helpful logic
+  const [isHelpful, setIsHelpful] = useState(comment.isHelpful || false);
+  const [loadingHelpful, setLoadingHelpful] = useState(false);
 
   const isParentComment = comment.commentId === null;
 
+  // Always refetch replies when toggling open
   const fetchReplies = useCallback(async () => {
-    if (!hasMoreReplies || isLoadingReplies) return;
     setIsLoadingReplies(true);
     setRepliesErr(null);
     try {
-      const lastTimestamp =
-        replies.length > 0 ? replies[replies.length - 1].createdAt : null;
-      const params = lastTimestamp ? { timestamp: lastTimestamp } : {};
       const response = await axiosPrivate.get(
-        `/comments/${comment.id}/replies`,
-        { params }
+        `/comments/${comment.id}/replies`
       );
       const newReplies = response.data.replies || [];
       const pagination = response.data.pagination || {};
-      setReplies((prev) => {
-        const existingIds = new Set(prev.map((r) => r.id));
-        const uniqueNewReplies = newReplies.filter(
-          (r) => !existingIds.has(r.id)
-        );
-        return [...prev, ...uniqueNewReplies];
-      });
-      if (!pagination.hasMore || newReplies.length === 0) {
-        setHasMoreReplies(false);
-      }
+      setReplies(newReplies);
+      setHasMoreReplies(!!pagination.hasMore);
     } catch (err) {
       if (err.name === "CanceledError" || err.code === "ERR_CANCELED") return;
       setRepliesErr("Błąd ładowania odpowiedzi");
     } finally {
       setIsLoadingReplies(false);
     }
-  }, [axiosPrivate, comment.id, replies, hasMoreReplies, isLoadingReplies]);
+  }, [axiosPrivate, comment.id]);
 
-  const toggleReplies = () => {
-    if (!isRepliesVisible && replies.length === 0) {
-      setReplies([]);
-      setHasMoreReplies(true);
+  // Refetch replies every time replies are shown
+  const handleToggleReplies = () => {
+    if (!isRepliesVisible) {
       fetchReplies();
+      setIsRepliesVisible(true);
+    } else {
+      setIsRepliesVisible(false);
+      setReplies([]); // clear replies so next open always refetches fresh data
     }
-    setIsRepliesVisible((v) => !v);
   };
 
   useSocketEvent(
@@ -107,8 +117,51 @@ const CommentPreview = ({ comment, socket }) => {
     setIsReplying(false);
     setHasMoreReplies(true);
   };
-
+  
   const authorAvatar = comment?.users?.files?.[0]?.filename;
+
+  // Voting handler for comments
+  const handleVote = async (value) => {
+    if (loadingVote) return;
+    setLoadingVote(true);
+
+    let newVote;
+    let newVoteCount;
+
+    if (vote === value) {
+      newVote = 0;
+      newVoteCount = voteCount - vote;
+    } else {
+      newVote = value;
+      newVoteCount = voteCount - vote + value;
+    }
+
+    try {
+      await axiosPrivate.put(`/comments/${comment.id}/vote`, { value: newVote });
+      setVote(newVote);
+      setVoteCount(newVoteCount);
+    } catch (err) {
+      console.log("Error voting on comment:", err);
+    } finally {
+      setLoadingVote(false);
+    }
+  };
+
+  // Helpful handler
+  const handleHelpful = async () => {
+    if (loadingHelpful) return;
+    setLoadingHelpful(true);
+    try {
+      await axiosPrivate.put(`/comments/${comment.id}/helpful`, { isHelpful: !isHelpful });
+      setIsHelpful((prev) => !prev);
+    } catch (err) {
+    } finally {
+      setLoadingHelpful(false);
+    }
+  };
+
+  // The post owner can mark/unmark as helpful
+  const isPostOwner = currentUserId && comment.posts?.userId === currentUserId;
 
   return (
     <Paper
@@ -122,9 +175,19 @@ const CommentPreview = ({ comment, socket }) => {
         width: "100%",
         border: `1.5px solid ${theme.palette.primary.main}`,
         boxShadow: '0 2px 12px 0 rgba(42,63,84,0.07)',
+        overflow: "hidden",
       }}
     >
-      <Stack direction="row" spacing={2} alignItems="flex-start" mb={1}>
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="flex-start"
+        mb={1}
+        sx={{
+          flexWrap: isMobile ? "wrap" : "nowrap",
+          alignItems: isMobile ? "flex-start" : "center",
+        }}
+      >
         <Link to={`/users/${comment.users.username}`}>
           <Avatar
             src={
@@ -140,12 +203,13 @@ const CommentPreview = ({ comment, socket }) => {
               color: "#fff",
               fontWeight: 700,
               border: `2px solid ${theme.palette.secondary.main}`,
+              flexShrink: 0,
             }}
           >
             {!authorAvatar && comment.users.username?.[0]?.toUpperCase()}
           </Avatar>
         </Link>
-        <Box>
+        <Box sx={{ minWidth: 0, flex: 1 }}>
           <Typography
             variant="subtitle1"
             component={Link}
@@ -155,6 +219,7 @@ const CommentPreview = ({ comment, socket }) => {
               color: theme.palette.text.primary,
               fontWeight: 600,
               "&:hover": { color: theme.palette.primary.main },
+              wordBreak: 'break-word',
             }}
           >
             {`${comment.users.name} ${comment.users.surname}`}
@@ -162,6 +227,38 @@ const CommentPreview = ({ comment, socket }) => {
           <Typography variant="caption" color="text.secondary" display="block">
             {formatDate(comment.createdAt)}
           </Typography>
+        </Box>
+        <Box
+          sx={{
+            ml: "auto",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            flexShrink: 0,
+            minWidth: isMobile ? 40 : "unset",
+            mt: isMobile ? 1 : 0,
+          }}
+        >
+          <Tooltip title="Oznaczony jako pomocny">
+            <span style={{ display: "flex", alignItems: "center" }}>
+              {isHelpful && (
+                <FontAwesomeIcon icon={faStarSolid} style={{ color: theme.palette.warning.main, fontSize: 22 }} />
+              )}
+              {isPostOwner && (
+                <IconButton
+                  size="small"
+                  onClick={handleHelpful}
+                  disabled={loadingHelpful}
+                  sx={{
+                    color: isHelpful ? theme.palette.warning.main : theme.palette.action.active,
+                    ml: 1,
+                  }}
+                >
+                  <FontAwesomeIcon icon={faStarSolid} />
+                </IconButton>
+              )}
+            </span>
+          </Tooltip>
         </Box>
       </Stack>
       <Typography variant="body1" sx={{ mb: 1, wordBreak: "break-word", color: theme.palette.text.primary }}>
@@ -205,16 +302,64 @@ const CommentPreview = ({ comment, socket }) => {
           ))}
         </Box>
       )}
+
+      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+        <Tooltip title="Głosuj w górę">
+          <IconButton
+            size="small"
+            sx={{
+              color: vote === 1 ? theme.palette.success.dark : theme.palette.success.main,
+              bgcolor: vote === 1 ? theme.palette.success.light : 'transparent',
+              borderRadius: 1,
+              transition: 'background 0.15s, color 0.15s',
+            }}
+            onClick={() => handleVote(1)}
+            disabled={loadingVote}
+          >
+            <FontAwesomeIcon icon={faChevronUp} />
+          </IconButton>
+        </Tooltip>
+        <Typography variant="body2" fontWeight={700} sx={{ color: theme.palette.text.primary }}>
+          {voteCount}
+        </Typography>
+        <Tooltip title="Głosuj w dół">
+          <IconButton
+            size="small"
+            sx={{
+              color: vote === -1 ? theme.palette.error.dark : theme.palette.error.main,
+              bgcolor: vote === -1 ? theme.palette.error.light : 'transparent',
+              borderRadius: 1,
+              transition: 'background 0.15s, color 0.15s',
+            }}
+            onClick={() => handleVote(-1)}
+            disabled={loadingVote}
+          >
+            <FontAwesomeIcon icon={faChevronDown} />
+          </IconButton>
+        </Tooltip>
+      </Stack>
+
       {isParentComment && (
-        <Stack direction="row" spacing={2} mt={1}>
+        <Stack
+          direction={isMobile ? "column" : "row"}
+          spacing={2}
+          mt={1}
+          sx={{
+            width: "100%",
+            alignItems: isMobile ? "stretch" : "center",
+            justifyContent: isMobile ? "flex-start" : "flex-start",
+            gap: 1,
+          }}
+        >
           <Button
             variant="outlined"
             size="small"
-            onClick={toggleReplies}
+            onClick={handleToggleReplies}
             sx={{
               color: theme.palette.primary.main,
               borderColor: theme.palette.primary.main,
               fontWeight: 600,
+              width: isMobile ? "100%" : "auto",
               "&:hover": {
                 bgcolor: theme.palette.secondary.main,
                 color: "#fff",
@@ -232,6 +377,7 @@ const CommentPreview = ({ comment, socket }) => {
               bgcolor: theme.palette.primary.main,
               color: "#fff",
               fontWeight: 600,
+              width: isMobile ? "100%" : "auto",
               "&:hover": {
                 bgcolor: theme.palette.secondary.main,
                 color: "#fff",
@@ -285,6 +431,8 @@ const CommentPreview = ({ comment, socket }) => {
                   color: "#fff",
                   borderColor: theme.palette.secondary.main,
                 },
+                width: isMobile ? "100%" : "auto",
+                mt: isMobile ? 1 : 0,
               }}
             >
               Załaduj więcej odpowiedzi

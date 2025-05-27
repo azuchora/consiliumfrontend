@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
 
   const isAuthed = () => auth?.accessToken ? true : false;
   const isVerified = () => auth?.roles.includes(ROLES.Verified);
-
+  
   return (
     <AuthContext.Provider value={{ auth, setAuth, persist, setPersist, isAuthed, setAvatar, setUsername, avatar, username, isVerified }}>
       {children}

@@ -54,7 +54,6 @@ const Navbar = () => {
     { to: '/register', label: 'Zarejestruj', icon: faUserPlus }
   ];
 
-  // Handler for avatar/username click (both desktop and mobile)
   const handleProfileClick = () => {
     if (username) {
       navigate(`/users/${username}`);
@@ -82,10 +81,8 @@ const Navbar = () => {
             Consilium
           </Typography>
 
-          {/* Desktop */}
           {!isMobile && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              {/* Forum button always visible */}
               <Button
                 component={Link}
                 to="/posts"
@@ -180,7 +177,6 @@ const Navbar = () => {
             </Box>
           )}
 
-          {/* Mobile */}
           {isMobile && (
             <IconButton
               color="inherit"
@@ -195,7 +191,6 @@ const Navbar = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Drawer for mobile */}
       <Drawer
         anchor="right"
         open={drawerOpen}
@@ -271,7 +266,7 @@ const Navbar = () => {
                 to="/"
                 onClick={handleDrawerToggle}
                 sx={{ color: '#fff', borderRadius: 1, mb: 1 }}
-                button={true}
+                button
               >
                 <ListItemText primary="Strona główna" />
               </ListItem>
@@ -280,7 +275,7 @@ const Navbar = () => {
                 to="/posts"
                 onClick={handleDrawerToggle}
                 sx={{ color: '#fff', borderRadius: 1, mb: 1 }}
-                button={true}
+                button
               >
                 <ListItemText primary="Forum" />
               </ListItem>
@@ -290,7 +285,7 @@ const Navbar = () => {
                   to="/verify"
                   onClick={handleDrawerToggle}
                   sx={{ color: '#fff', borderRadius: 1, mb: 1 }}
-                  button={true}
+                  button
                 >
                   <ListItemText primary="Weryfikacja" />
                 </ListItem>
@@ -303,7 +298,7 @@ const Navbar = () => {
                   mt: 1,
                   '&:hover': { bgcolor: theme.palette.error.main, color: '#fff' }
                 }}
-                button={true}
+                button
               >
                 <ListItemText primary="Wyloguj" />
               </ListItem>

@@ -10,7 +10,7 @@ const usePostsFetcher = (filters = {}) => {
   const fetchPosts = useCallback(async (timestamp = null, reset = false) => {
       try {
         setIsLoading(true);
-        console.log("Fetching posts with timestamp:", timestamp);
+        
         const params = {
           ...(timestamp && { timestamp }),
           ...filters,
@@ -20,7 +20,6 @@ const usePostsFetcher = (filters = {}) => {
 
         const newPosts = response.data.posts || [];
         const pagination = response.data.pagination || {};
-        console.log(pagination);
 
         setPosts((prevPosts) => {
           if (reset) {

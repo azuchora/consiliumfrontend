@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { BACKEND_URL } from "../../api/axios";
 import {
@@ -16,13 +16,22 @@ import {
   CircularProgress,
   List,
   ListItem,
+  Dialog,
+  DialogContent,
+  IconButton,
+  Collapse,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import PostPreview from "../posts/PostPreview";
 import useAuth from "../../hooks/useAuth";
 import { ROLES } from "../../constants/roles";
 import usePostsFetcher from "../../hooks/usePostsFetcher";
 import InfiniteScroll from "react-infinite-scroll-component";
+import EditProfile from "./EditProfile";
+import MissingPage from "../../pages/MissingPage";
 
 const getRoleNames = (roleIds) => {
   if (!Array.isArray(roleIds)) return [];
@@ -39,9 +48,12 @@ const UserProfile = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { username: authedUsername } = useAuth();
+  const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [editOpen, setEditOpen] = useState(false);
+  const [showPosts, setShowPosts] = useState(false);
 
   const {
     posts,
@@ -74,6 +86,16 @@ const UserProfile = () => {
       isMounted = false;
     };
   }, [username, axiosPrivate]);
+
+  const handleProfileUpdated = () => {
+    setEditOpen(false);
+    setLoading(true);
+    axiosPrivate
+      .get(`/users/${username}`)
+      .then((res) => setUser(res.data.user))
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
+  };
 
   const loadMorePosts = () => {
     const lastTimestamp = posts.length > 0 ? posts[posts.length - 1].createdAt : null;
@@ -117,6 +139,19 @@ const UserProfile = () => {
         width: "100%",
       }}
     >
+      <Box sx={{ mb: 1 }}>
+        <IconButton
+          onClick={() => navigate(-1)}
+          sx={{
+            color: "primary.main",
+            mb: 1,
+          }}
+          aria-label="Powrót"
+        >
+          <ArrowBackIcon />
+        </IconButton>
+      </Box>
+
       <Paper
         elevation={3}
         sx={{
@@ -166,7 +201,7 @@ const UserProfile = () => {
             >
               @{user.username}
             </Typography>
-            <Stack direction="row" spacing={1} sx={{ mb: 1, flexWrap: "wrap" }}>
+            <Stack direction="row" spacing={1} sx={{ mb: 1, flexWrap: "wrap"}}>
               <Chip
                 label={`ID: ${user.id}`}
                 size="small"
@@ -210,7 +245,7 @@ const UserProfile = () => {
                     borderColor: theme.palette.secondary.main,
                   },
                 }}
-                disabled
+                onClick={() => setEditOpen(true)}
               >
                 Edytuj profil
               </Button>
@@ -229,64 +264,93 @@ const UserProfile = () => {
           boxShadow: "0 2px 8px 0 rgba(42,63,84,0.07)",
         }}
       >
-        <Typography
-          variant="h6"
-          fontWeight={700}
-          color={theme.palette.primary.main}
-          sx={{ mb: 2 }}
-        >
-          Posty użytkownika
-        </Typography>
-        <Divider sx={{ mb: 2 }} />
-        <List sx={{ width: "100%" }}>
-          <InfiniteScroll
-            dataLength={posts.length}
-            next={loadMorePosts}
-            hasMore={hasMore}
-            loader={
-              <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
-                <CircularProgress />
-              </Box>
-            }
-            endMessage={
-              posts.length > 0 && (
-                <Box
-                  sx={{
-                    textAlign: "center",
-                    color: "#888",
-                    fontSize: "1.1rem",
-                    mt: 4,
-                    mb: 2,
-                    fontStyle: "italic",
-                    opacity: 0.8,
-                  }}
-                >
-                  To już wszystkie posty.
-                </Box>
-              )
-            }
-            scrollThreshold={0.95}
-            style={{ overflow: "visible" }} // ensure no scroll on the list itself
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Typography
+            variant="h6"
+            fontWeight={700}
+            color={theme.palette.primary.main}
           >
-            {posts.length === 0 && !isLoading ? (
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                align="center"
-                sx={{ py: 4 }}
-              >
-                Użytkownik nie dodał jeszcze żadnych postów.
-              </Typography>
-            ) : (
-              posts.map((post) => (
-                <ListItem key={post.id ?? post.createdAt} disablePadding sx={{ mb: 2 }}>
-                  <PostPreview post={post} />
-                </ListItem>
-              ))
-            )}
-          </InfiniteScroll>
-        </List>
+            Posty użytkownika
+          </Typography>
+          <IconButton
+            onClick={() => setShowPosts((prev) => !prev)}
+            aria-label={showPosts ? "Ukryj posty" : "Pokaż posty"}
+            sx={{
+              color: theme.palette.primary.main,
+              ml: 1,
+              transition: "transform 0.2s",
+              transform: showPosts ? "rotate(0deg)" : "rotate(-90deg)",
+            }}
+          >
+            {showPosts ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </IconButton>
+        </Stack>
+        <Divider sx={{ mb: 2 }} />
+        <Collapse in={showPosts}>
+          <List sx={{ width: "100%" }}>
+            <InfiniteScroll
+              dataLength={posts.length}
+              next={loadMorePosts}
+              hasMore={hasMore}
+              loader={
+                <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
+                  <CircularProgress />
+                </Box>
+              }
+              endMessage={
+                posts.length > 0 && (
+                  <Box
+                    sx={{
+                      textAlign: "center",
+                      color: "#888",
+                      fontSize: "1.1rem",
+                      mt: 4,
+                      mb: 2,
+                      fontStyle: "italic",
+                      opacity: 0.8,
+                    }}
+                  >
+                    To już wszystkie posty.
+                  </Box>
+                )
+              }
+              scrollThreshold={0.95}
+              style={{ overflow: "visible" }}
+            >
+              {posts.length === 0 && !isLoading ? (
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  align="center"
+                  sx={{ py: 4 }}
+                >
+                  Użytkownik nie dodał jeszcze żadnych postów.
+                </Typography>
+              ) : (
+                posts.map((post) => (
+                  <ListItem key={post.id ?? post.createdAt} disablePadding sx={{ mb: 2 }}>
+                    <PostPreview post={post} />
+                  </ListItem>
+                ))
+              )}
+            </InfiniteScroll>
+          </List>
+        </Collapse>
       </Paper>
+
+      <Dialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="xs" fullWidth disableScrollLock>
+        <DialogContent
+          sx={{
+            p: 1,
+            pt: 2,
+            pb: 2,
+            width: "100%",
+            boxSizing: "border-box",
+          }}
+        >
+          <EditProfile user={user} onClose={() => setEditOpen(false)} onUpdated={handleProfileUpdated} />
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

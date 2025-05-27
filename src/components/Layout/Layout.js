@@ -11,8 +11,9 @@ const Layout = () => {
         flexDirection: 'column',
         minHeight: '100vh',
         width: '100%',
-        maxWidth: '100%',
+        maxWidth: '100vw',
         bgcolor: 'background.default',
+        overflowX: 'hidden',
       }}
     >
       <Navbar />

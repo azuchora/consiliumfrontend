@@ -1,16 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
 
 html, body, #root {
-font-family: 'Nunito', sans-serif;
-background-color: #f5f7fa;
-color: #1a1a1a;
-overflow-y: auto;
+    font-family: 'Nunito', sans-serif;
+    background-color: #f5f7fa;
+    color: #1a1a1a;
+    overflow-y: auto;
 }
 
 * {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {

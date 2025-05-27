@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BACKEND_URL } from '../../api/axios';
 import useFormatDate from '../../hooks/useFormatDate';
 import useFileTypeCheck from '../../hooks/useFileTypeCheck';
@@ -20,9 +20,22 @@ import {
   useMediaQuery
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import useAxiosPrivate from '../../hooks/useAxiosPrivate';
+import useAuth from '../../hooks/useAuth';
 
 const PostPreview = ({ post, isPage = false }) => {
+  const { auth } = useAuth();
+  const currentUserId = auth?.id;
+
+  const totalVotes = post.post_votes?.reduce((sum, v) => sum + v.value, 0) || 0;
+  const userVote = post.post_votes?.find(v => v.userId === currentUserId)?.value || 0;
+
   const [previewFile, setPreviewFile] = useState(null);
+  const [vote, setVote] = useState(userVote);
+  const [voteCount, setVoteCount] = useState(totalVotes);
+  const [loadingVote, setLoadingVote] = useState(false);
+  const axiosPrivate = useAxiosPrivate();
+
   const formatDate = useFormatDate();
   const { isImage } = useFileTypeCheck();
   const theme = useTheme();
@@ -37,11 +50,43 @@ const PostPreview = ({ post, isPage = false }) => {
   const otherFiles = post.files?.filter(file => !isImage(file.filename)) || [];
 
   const closePreview = () => setPreviewFile(null);
+  
+  useEffect(() => {
+    setVote(userVote);
+    setVoteCount(totalVotes);
+  }, [userVote, totalVotes, post.id, currentUserId]);
 
   if (!post?.id) return null;
 
   const authorAvatar = post?.users?.files?.[0]?.filename;
   const authorInitial = post.users.username?.[0]?.toUpperCase() || '?';
+
+
+  const handleVote = async (value) => {
+    if (loadingVote) return;
+    setLoadingVote(true);
+
+    let newVote;
+    let newVoteCount;
+
+    if (vote === value) {
+      newVote = 0;
+      newVoteCount = voteCount - vote;
+    } else {
+      newVote = value;
+      newVoteCount = voteCount - vote + value;
+    }
+
+    try {
+      await axiosPrivate.put(`/posts/${post.id}/vote`, { value: newVote });
+      setVote(newVote);
+      setVoteCount(newVoteCount);
+    } catch (err) {
+      console.log(`Voting error: ${err.message}`);
+    } finally {
+      setLoadingVote(false);
+    }
+  };
 
   return (
     <>
@@ -251,13 +296,35 @@ const PostPreview = ({ post, isPage = false }) => {
             }}
           >
             <Tooltip title="Głosuj w górę">
-              <IconButton size="small" sx={{ color: theme.palette.success.main }}>
+              <IconButton
+                size="small"
+                sx={{
+                  color: vote === 1 ? theme.palette.success.dark : theme.palette.success.main,
+                  bgcolor: vote === 1 ? theme.palette.success.light : 'transparent',
+                  borderRadius: 1,
+                  transition: 'background 0.15s, color 0.15s',
+                }}
+                onClick={() => handleVote(1)}
+                disabled={loadingVote}
+              >
                 <FontAwesomeIcon icon={faChevronUp} />
               </IconButton>
             </Tooltip>
-            <Typography variant="body2" fontWeight={700} sx={{ color: theme.palette.text.primary }}>2</Typography>
+            <Typography variant="body2" fontWeight={700} sx={{ color: theme.palette.text.primary }}>
+              {voteCount}
+            </Typography>
             <Tooltip title="Głosuj w dół">
-              <IconButton size="small" sx={{ color: theme.palette.error.main }}>
+              <IconButton
+                size="small"
+                sx={{
+                  color: vote === -1 ? theme.palette.error.dark : theme.palette.error.main,
+                  bgcolor: vote === -1 ? theme.palette.error.light : 'transparent',
+                  borderRadius: 1,
+                  transition: 'background 0.15s, color 0.15s',
+                }}
+                onClick={() => handleVote(-1)}
+                disabled={loadingVote}
+              >
                 <FontAwesomeIcon icon={faChevronDown} />
               </IconButton>
             </Tooltip>

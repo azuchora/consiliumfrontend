@@ -12,7 +12,9 @@ const useRefreshToken = () => {
       return { 
         ...prev, 
         accessToken: response.data.accessToken,
-        roles: response.data.roles
+        roles: response.data.roles,
+        id: response.data.id,
+        username: response.data.username,
        }
     })
     setAvatar(response.data.avatarFilename);

@@ -18,9 +18,9 @@ const PostCreateForm = ({ onPostCreated }) => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    postStatusId: "",
+    postStatusId: "1",
     age: "",
-    gender: "",
+    gender: "male",
   });
   const [files, setFiles] = useState([]);
   const [error, setError] = useState(null);
@@ -70,9 +70,9 @@ const PostCreateForm = ({ onPostCreated }) => {
       setFormData({
         title: "",
         description: "",
-        postStatusId: "",
+        postStatusId: "1",
         age: "",
-        gender: "",
+        gender: "male",
       });
       setFiles([]);
       if (onPostCreated) onPostCreated(response.data.post);
@@ -167,6 +167,7 @@ const PostCreateForm = ({ onPostCreated }) => {
             label="Status"
             onChange={handleChange}
             disabled={isSubmitting}
+            MenuProps={{ disableScrollLock: true }}
             sx={{
               bgcolor: "#fff",
               borderRadius: 1,
@@ -183,9 +184,8 @@ const PostCreateForm = ({ onPostCreated }) => {
               },
             }}
           >
-            <MenuItem value="">Wybierz status</MenuItem>
-            <MenuItem value="1">Pilne</MenuItem>
-            <MenuItem value="2">Zwykły</MenuItem>
+            <MenuItem value="1">Zwykły</MenuItem>
+            <MenuItem value="2">Pilne</MenuItem>
             <MenuItem value="3">Informacyjny</MenuItem>
           </Select>
         </FormControl>
@@ -226,6 +226,7 @@ const PostCreateForm = ({ onPostCreated }) => {
             label="Płeć"
             onChange={handleChange}
             disabled={isSubmitting}
+            MenuProps={{ disableScrollLock: true }}
             sx={{
               bgcolor: "#fff",
               borderRadius: 1,
@@ -244,7 +245,6 @@ const PostCreateForm = ({ onPostCreated }) => {
           >
             <MenuItem value="male">Mężczyzna</MenuItem>
             <MenuItem value="female">Kobieta</MenuItem>
-            <MenuItem value="other">Inna</MenuItem>
           </Select>
         </FormControl>
       </Box>
