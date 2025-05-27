@@ -18,7 +18,7 @@ const PostCreateForm = ({ onPostCreated }) => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    postStatusId: "1",
+    postStatusId: 1,
     age: "",
     gender: "male",
   });
@@ -70,7 +70,7 @@ const PostCreateForm = ({ onPostCreated }) => {
       setFormData({
         title: "",
         description: "",
-        postStatusId: "1",
+        postStatusId: 1,
         age: "",
         gender: "male",
       });
@@ -184,9 +184,9 @@ const PostCreateForm = ({ onPostCreated }) => {
               },
             }}
           >
-            <MenuItem value="1">Zwykły</MenuItem>
-            <MenuItem value="2">Pilne</MenuItem>
-            <MenuItem value="3">Informacyjny</MenuItem>
+            <MenuItem value={1}>Zwykły</MenuItem>
+            <MenuItem value={2}>Pilne</MenuItem>
+            <MenuItem value={3}>Informacyjny</MenuItem>
           </Select>
         </FormControl>
 

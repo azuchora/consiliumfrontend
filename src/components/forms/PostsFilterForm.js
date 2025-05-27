@@ -91,8 +91,8 @@ const PostFilterForm = ({ handleSearchSubmit, handleInputChange, filters }) => {
           >
             <MenuItem value="">Wszystkie statusy</MenuItem>
             <MenuItem value="1">Pilne</MenuItem>
-            <MenuItem value="2">OK</MenuItem>
-            <MenuItem value="3">Inne</MenuItem>
+            <MenuItem value="2">Zwykły</MenuItem>
+            <MenuItem value="3">Informacyjne</MenuItem>
           </Select>
         </FormControl>
 

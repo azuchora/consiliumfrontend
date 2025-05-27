@@ -7,13 +7,21 @@ const usePostsFetcher = (filters = {}) => {
   const [isLoading, setIsLoading] = useState(false);
   const axiosPrivate = useAxiosPrivate();
 
-  const fetchPosts = useCallback(async (timestamp = null, reset = false) => {
+  const filterNonNull = (obj) =>
+    Object.fromEntries(
+      Object.entries(obj).filter(
+        ([, v]) => v !== null && v !== undefined && v !== ''
+      )
+    );
+
+  const fetchPosts = useCallback(
+    async (timestamp = null, reset = false) => {
       try {
         setIsLoading(true);
-        
+
         const params = {
           ...(timestamp && { timestamp }),
-          ...filters,
+          ...filterNonNull(filters),
         };
 
         const response = await axiosPrivate.get('/posts', { params });
