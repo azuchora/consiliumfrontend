@@ -43,20 +43,17 @@ const CommentPreview = ({ comment, socket }) => {
   const { auth } = useAuth();
   const currentUserId = auth?.id;
 
-  // Voting logic for comments
   const initialTotalVotes = comment.comment_votes?.reduce((sum, v) => sum + v.value, 0) || 0;
   const initialUserVote = comment.comment_votes?.find(v => v.userId === currentUserId)?.value || 0;
   const [vote, setVote] = useState(initialUserVote);
   const [voteCount, setVoteCount] = useState(initialTotalVotes);
   const [loadingVote, setLoadingVote] = useState(false);
 
-  // Helpful logic
   const [isHelpful, setIsHelpful] = useState(comment.isHelpful || false);
   const [loadingHelpful, setLoadingHelpful] = useState(false);
 
   const isParentComment = comment.commentId === null;
 
-  // Always refetch replies when toggling open
   const fetchReplies = useCallback(async () => {
     setIsLoadingReplies(true);
     setRepliesErr(null);
@@ -76,14 +73,13 @@ const CommentPreview = ({ comment, socket }) => {
     }
   }, [axiosPrivate, comment.id]);
 
-  // Refetch replies every time replies are shown
   const handleToggleReplies = () => {
     if (!isRepliesVisible) {
       fetchReplies();
       setIsRepliesVisible(true);
     } else {
       setIsRepliesVisible(false);
-      setReplies([]); // clear replies so next open always refetches fresh data
+      setReplies([]);
     }
   };
 
@@ -120,7 +116,6 @@ const CommentPreview = ({ comment, socket }) => {
   
   const authorAvatar = comment?.users?.files?.[0]?.filename;
 
-  // Voting handler for comments
   const handleVote = async (value) => {
     if (loadingVote) return;
     setLoadingVote(true);
@@ -147,7 +142,6 @@ const CommentPreview = ({ comment, socket }) => {
     }
   };
 
-  // Helpful handler
   const handleHelpful = async () => {
     if (loadingHelpful) return;
     setLoadingHelpful(true);
@@ -160,7 +154,6 @@ const CommentPreview = ({ comment, socket }) => {
     }
   };
 
-  // The post owner can mark/unmark as helpful
   const isPostOwner = currentUserId && comment.posts?.userId === currentUserId;
 
   return (

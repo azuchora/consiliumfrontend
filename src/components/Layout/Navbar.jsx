@@ -21,9 +21,10 @@ import {
   ListItemText,
   Box,
   Divider,
-  useMediaQuery
+  useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import NotificationBell from '../notifications/NotificationBell';
 
 const Navbar = () => {
   const { isAuthed, username, avatar, isVerified } = useAuth();
@@ -81,8 +82,8 @@ const Navbar = () => {
             Consilium
           </Typography>
 
-          {!isMobile && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {!isMobile && (
               <Button
                 component={Link}
                 to="/posts"
@@ -93,7 +94,14 @@ const Navbar = () => {
               >
                 Forum
               </Button>
-              {!isAuthed() ? (
+            )}
+
+            {isAuthed() && (
+              <NotificationBell mobile={isMobile} />
+            )}
+
+            {!isMobile && (
+              !isAuthed() ? (
                 guestLinks.map((link) => (
                   <Button
                     key={link.to}
@@ -173,21 +181,21 @@ const Navbar = () => {
                     <MenuItem onClick={handleLogout}>Wyloguj</MenuItem>
                   </Menu>
                 </>
-              )}
-            </Box>
-          )}
+              )
+            )}
 
-          {isMobile && (
-            <IconButton
-              color="inherit"
-              edge="end"
-              onClick={handleDrawerToggle}
-              aria-label="menu"
-              size="large"
-            >
-              <FontAwesomeIcon icon={faBars} />
-            </IconButton>
-          )}
+            {isMobile && (
+              <IconButton
+                color="inherit"
+                edge="end"
+                onClick={handleDrawerToggle}
+                aria-label="menu"
+                size="large"
+              >
+                <FontAwesomeIcon icon={faBars} />
+              </IconButton>
+            )}
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -279,6 +287,7 @@ const Navbar = () => {
               >
                 <ListItemText primary="Forum" />
               </ListItem>
+              
               {!isVerified() && (
                 <ListItem
                   component={Link}
