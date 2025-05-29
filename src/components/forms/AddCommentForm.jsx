@@ -61,8 +61,15 @@ const AddCommentForm = ({ postId, parentCommentId = null, onCommentAdded }) => {
       setFiles([]);
       if (onCommentAdded) onCommentAdded(response.data.comment);
     } catch (err) {
-      console.error(err);
-      setError("Błąd podczas dodawania komentarza");
+      if (
+        err.response &&
+        err.response.status === 404 &&
+        parentCommentId !== null
+      ) {
+        setError("Nie można odpowiedzieć na usunięty komentarz.");
+      } else {
+        setError("Błąd podczas dodawania komentarza");
+      }
     } finally {
       setIsSubmitting(false);
     }

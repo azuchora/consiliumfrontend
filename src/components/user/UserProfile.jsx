@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import useUser from "../../hooks/useUser";
 import { BACKEND_URL } from "../../api/axios";
 import {
   Box,
@@ -31,6 +31,7 @@ import { ROLES } from "../../constants/roles";
 import usePostsFetcher from "../../hooks/usePostsFetcher";
 import InfiniteScroll from "react-infinite-scroll-component";
 import EditProfile from "./EditProfile";
+import useFollow from "../../hooks/useFollow";
 
 const getRoleNames = (roleIds) => {
   if (!Array.isArray(roleIds)) return [];
@@ -43,17 +44,15 @@ const getRoleNames = (roleIds) => {
 
 const UserProfile = () => {
   const { username } = useParams();
-  const axiosPrivate = useAxiosPrivate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { username: authedUsername } = useAuth();
   const navigate = useNavigate();
 
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading, fetchUser } = useUser(username);
+
   const [editOpen, setEditOpen] = useState(false);
   const [showPosts, setShowPosts] = useState(false);
-  const [followLoading, setFollowLoading] = useState(false);
 
   const {
     posts,
@@ -61,40 +60,25 @@ const UserProfile = () => {
     isLoading,
     fetchPosts,
     resetPosts,
+    setPosts,
   } = usePostsFetcher({ username });
 
+  const { followed, followLoading, handleFollowToggle, setFollowed } = useFollow(user, "user");
+
+  // eslint-disable-next-line
   useEffect(() => {
     resetPosts();
     fetchPosts(null, true);
+    // eslint-disable-next-line
   }, [username]);
 
   useEffect(() => {
-    let isMounted = true;
-    setLoading(true);
-    axiosPrivate
-      .get(`/users/${username}`)
-      .then((res) => {
-        if (isMounted) setUser(res.data.user);
-      })
-      .catch(() => {
-        if (isMounted) setUser(null);
-      })
-      .finally(() => {
-        if (isMounted) setLoading(false);
-      });
-    return () => {
-      isMounted = false;
-    };
-  }, [username, axiosPrivate]);
+    setFollowed(user?.isFollowed || false);
+  }, [user?.isFollowed, user?.id, setFollowed]);
 
   const handleProfileUpdated = () => {
     setEditOpen(false);
-    setLoading(true);
-    axiosPrivate
-      .get(`/users/${username}`)
-      .then((res) => setUser(res.data.user))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
+    fetchUser();
   };
 
   const loadMorePosts = () => {
@@ -112,22 +96,8 @@ const UserProfile = () => {
       ? `${BACKEND_URL}/static/${user.files[0].filename}`
       : undefined;
 
-  const handleFollowToggle = async () => {
-    if (!user) return;
-    setFollowLoading(true);
-    try {
-      if (user.isFollowed) {
-        await axiosPrivate.delete(`/users/${user.id}/follow`);
-        setUser((prev) => prev && { ...prev, isFollowed: false });
-      } else {
-        await axiosPrivate.post(`/users/${user.id}/follow`);
-        setUser((prev) => prev && { ...prev, isFollowed: true });
-      }
-    } catch (e) {
-      
-    } finally {
-      setFollowLoading(false);
-    }
+  const handlePostDeleted = (deletedId) => {
+    setPosts(prev => prev.filter(p => p.id !== deletedId));
   };
 
   if (loading) {
@@ -273,8 +243,8 @@ const UserProfile = () => {
 
             {canFollow && (
               <Button
-                variant={user.isFollowed ? "contained" : "outlined"}
-                color={user.isFollowed ? "secondary" : "primary"}
+                variant={followed ? "contained" : "outlined"}
+                color={followed ? "secondary" : "primary"}
                 sx={{
                   borderRadius: 2,
                   fontWeight: 600,
@@ -284,7 +254,7 @@ const UserProfile = () => {
                 disabled={followLoading}
                 onClick={handleFollowToggle}
               >
-                {user.isFollowed ? "Obserwujesz" : "Obserwuj"}
+                {followed ? "Obserwujesz" : "Obserwuj"}
               </Button>
             )}
           </Box>
@@ -366,7 +336,7 @@ const UserProfile = () => {
               ) : (
                 posts.map((post) => (
                   <ListItem key={post.id ?? post.createdAt} disablePadding sx={{ mb: 2 }}>
-                    <PostPreview post={post} />
+                    <PostPreview post={post} onDelete={handlePostDeleted}/>
                   </ListItem>
                 ))
               )}

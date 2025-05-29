@@ -1,36 +1,38 @@
 import { useEffect, useState } from 'react';
-import { BACKEND_URL } from '../../api/axios';
 import useFormatDate from '../../hooks/useFormatDate';
 import useFileTypeCheck from '../../hooks/useFileTypeCheck';
-import FilePreview from './FilePreview';
 import PreviewModal from './PreviewModal';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faComment, faChevronUp, faChevronDown, faStar as faStarSolid, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faComment, faStar as faStarSolid, faUser, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import {
   Box,
-  Avatar,
-  Typography,
-  IconButton,
   Button,
   Paper,
   Divider,
   Stack,
-  Tooltip,
   Chip,
-  useMediaQuery
+  useMediaQuery,
+  Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 import useAuth from '../../hooks/useAuth';
+import OptionsMenu from '../menus/OptionsMenu';
+import useVoting from '../../hooks/useVoting';
+import FilePreviews from './FilePreviews';
+import AuthorInfo from '../user/AuthorInfo';
+import VotingBar from '../menus/VotingBar';
+import useFollow from '../../hooks/useFollow';
+import useDeleteEntity from '../../hooks/useDeleteEntity';
 
 const genderMap = {
   male: 'Mężczyzna',
   female: 'Kobieta'
 };
 
-const PostPreview = ({ post, isPage = false }) => {
+const PostPreview = ({ post, isPage = false, onDelete }) => {
   const { auth } = useAuth();
   const currentUserId = auth?.id;
 
@@ -38,11 +40,7 @@ const PostPreview = ({ post, isPage = false }) => {
   const userVote = post.post_votes?.find(v => v.userId === currentUserId)?.value || 0;
 
   const [previewFile, setPreviewFile] = useState(null);
-  const [vote, setVote] = useState(userVote);
-  const [voteCount, setVoteCount] = useState(totalVotes);
-  const [followed, setFollowed] = useState(post.isFollowed || false);
-  const [followLoading, setFollowLoading] = useState(false);
-  const [loadingVote, setLoadingVote] = useState(false);
+
   const axiosPrivate = useAxiosPrivate();
 
   const formatDate = useFormatDate();
@@ -60,65 +58,36 @@ const PostPreview = ({ post, isPage = false }) => {
 
   const closePreview = () => setPreviewFile(null);
 
-  useEffect(() => {
-    setVote(userVote);
-    setVoteCount(totalVotes);
-  }, [userVote, totalVotes, post.id, currentUserId]);
+  const { followed, followLoading, handleFollowToggle, setFollowed } = useFollow(post, "post");
 
   useEffect(() => {
     setFollowed(post.isFollowed || false);
-  }, [post.isFollowed, post.id]);
+  }, [post.isFollowed, post.id, setFollowed]);
 
+  const { vote, voteCount, loading: loadingVote, handleVote } = useVoting({
+    initialVote: userVote,
+    initialCount: totalVotes,
+    onVote: async (value) => axiosPrivate.put(`/posts/${post.id}/vote`, { value }),
+  });
+
+  const {
+    deleteDialogOpen,
+    setDeleteDialogOpen,
+    deleteLoading,
+    handleDelete,
+  } = useDeleteEntity({
+    entityId: post.id,
+    entityType: "post",
+    onDelete,
+  });
+  
   if (!post?.id) return null;
 
   const authorAvatar = post?.users?.files?.[0]?.filename;
   const authorInitial = post.users.username?.[0]?.toUpperCase() || '?';
 
-  const handleVote = async (value) => {
-    if (loadingVote) return;
-    setLoadingVote(true);
-
-    let newVote;
-    let newVoteCount;
-
-    if (vote === value) {
-      newVote = 0;
-      newVoteCount = voteCount - vote;
-    } else {
-      newVote = value;
-      newVoteCount = voteCount - vote + value;
-    }
-
-    try {
-      await axiosPrivate.put(`/posts/${post.id}/vote`, { value: newVote });
-      setVote(newVote);
-      setVoteCount(newVoteCount);
-    } catch (err) {
-      console.log(`Voting error: ${err.message}`);
-    } finally {
-      setLoadingVote(false);
-    }
-  };
-
   const isOwnPost = currentUserId && post.users?.id === currentUserId;
   const canFollowPost = currentUserId && !isOwnPost;
-  const handleFollowToggle = async () => {
-    if (!canFollowPost) return;
-    setFollowLoading(true);
-    try {
-      if (followed) {
-        await axiosPrivate.delete(`/posts/${post.id}/follow`);
-        setFollowed(false);
-      } else {
-        await axiosPrivate.post(`/posts/${post.id}/follow`);
-        setFollowed(true);
-      }
-    } catch (e) {
-      
-    } finally {
-      setFollowLoading(false);
-    }
-  };
 
   const age = post.age;
   const gender = post.gender ? genderMap[post.gender] || post.gender : null;
@@ -137,12 +106,39 @@ const PostPreview = ({ post, isPage = false }) => {
           border: `1.5px solid ${theme.palette.primary.main}`,
           transition: 'box-shadow 0.2s, border-color 0.2s',
           boxShadow: '0 2px 12px 0 rgba(42,63,84,0.07)',
+          position: 'relative',
           '&:hover': {
             boxShadow: '0 8px 32px 0 rgba(42,63,84,0.18)',
             borderColor: theme.palette.secondary.main
           }
         }}
       >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 3,
+            right: 3,
+            zIndex: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            gap: 0.5,
+          }}
+        >
+          <OptionsMenu
+            isOwner={isOwnPost}
+            loading={deleteLoading}
+            deleteDialogOpen={deleteDialogOpen}
+            setDeleteDialogOpen={setDeleteDialogOpen}
+            deleteTitle="Usuń post"
+            deleteText="Czy na pewno chcesz usunąć ten post? Tej operacji nie można cofnąć."
+            onDeleteConfirm={handleDelete}
+          >
+            <FontAwesomeIcon icon={faTrash} style={{ marginRight: 8 }} />
+            Usuń post
+          </OptionsMenu>
+        </Box>
+
         <Stack
           direction="row"
           alignItems="center"
@@ -155,90 +151,14 @@ const PostPreview = ({ post, isPage = false }) => {
             overflow: 'visible'
           }}
         >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minWidth: 48,
-              mr: 1,
-              p: 0,
-            }}
-          >
-            <Link to={`/users/${post.users.username}`}>
-              <Avatar
-                src={authorAvatar ? `${BACKEND_URL}/static/${authorAvatar}` : undefined}
-                alt={post.users.username}
-                sx={{
-                  width: 48,
-                  height: 48,
-                  bgcolor: theme.palette.primary.main,
-                  color: '#fff',
-                  fontWeight: 700,
-                  fontSize: 22,
-                  flexShrink: 0,
-                  border: `2px solid ${theme.palette.secondary.main}`
-                }}
-              >
-                {!authorAvatar && authorInitial}
-              </Avatar>
-            </Link>
-          </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              flex: 1,
-              minWidth: 0,
-              width: '100%',
-              gap: 0.2,
-              overflow: 'visible'
-            }}
-          >
-            <Typography
-              variant="subtitle1"
-              fontWeight={700}
-              color={theme.palette.text.primary}
-              component={Link}
-              to={`/users/${post.users.username}`}
-              sx={{
-                textDecoration: 'none',
-                color: theme.palette.text.primary,
-                display: 'block',
-                overflow: isMobile ? 'visible' : 'hidden',
-                textOverflow: isMobile ? 'unset' : 'ellipsis',
-                whiteSpace: isMobile ? 'normal' : 'nowrap',
-                fontSize: { xs: '1rem', sm: '1.1rem' },
-                minWidth: 0,
-                flexShrink: 0,
-                flexGrow: 1,
-                wordBreak: isMobile ? 'break-word' : 'normal',
-                maxWidth: '100%',
-                mr: 0,
-              }}
-            >
-              {`${post?.users.name} ${post.users.surname}`}
-            </Typography>
-            <Typography
-              variant="caption"
-              color={theme.palette.text.secondary}
-              sx={{
-                whiteSpace: isMobile ? 'normal' : 'nowrap',
-                overflow: isMobile ? 'visible' : 'hidden',
-                textOverflow: isMobile ? 'unset' : 'ellipsis',
-                fontSize: { xs: '0.85rem', sm: '0.95rem' },
-                mt: 0.2,
-                mb: 0.2,
-                width: '100%',
-                minWidth: 0,
-                display: 'block',
-                wordBreak: isMobile ? 'break-word' : 'normal',
-              }}
-            >
-              {formatDate(post.createdAt)}
-            </Typography>
-          </Box>
+          <AuthorInfo
+            user={post.users}
+            avatar={authorAvatar}
+            initial={authorInitial}
+            date={formatDate(post.createdAt)}
+            theme={theme}
+            isMobile={isMobile}
+          />
           {!isMobile && (
             <Stack
               direction="row"
@@ -323,6 +243,7 @@ const PostPreview = ({ post, isPage = false }) => {
                   mb: 1,
                   mt: 0,
                   overflow: 'hidden',
+                  gap: 1,
                 }}
               >
                 <Chip
@@ -489,70 +410,12 @@ const PostPreview = ({ post, isPage = false }) => {
           {post.description}
         </Typography>
 
-        {imageFiles.length > 0 && (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: isMobile ? 'column' : 'row',
-              gap: 1,
-              mb: 1,
-              width: '100%',
-              alignItems: isMobile ? 'stretch' : 'center',
-              justifyContent: isMobile ? 'flex-start' : 'flex-start',
-            }}
-          >
-            {imageFiles.map((file) => (
-              <Box
-                key={file.id || file.filename}
-                component="img"
-                src={`${BACKEND_URL}/static/${file.filename}`}
-                alt={file.filename}
-                sx={{
-                  width: isMobile ? '100%' : 120,
-                  maxWidth: '100%',
-                  height: isMobile ? 'auto' : 80,
-                  objectFit: 'cover',
-                  borderRadius: 2,
-                  boxShadow: 1,
-                  cursor: 'pointer',
-                  border: `2px solid ${theme.palette.primary.light}`,
-                  background: theme.palette.background.default,
-                  transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s',
-                  mt: 0,
-                  mb: isMobile ? 1 : 0,
-                  '&:hover': {
-                    ...(isMobile
-                      ? {}
-                      : {
-                          transform: 'scale(1.07)',
-                          boxShadow: 4,
-                          borderColor: theme.palette.secondary.main
-                        })
-                  }
-                }}
-                onClick={() => setPreviewFile({ type: 'image', url: `${BACKEND_URL}/static/${file.filename}` })}
-              />
-            ))}
-          </Box>
-        )}
-
-        {otherFiles.length > 0 && (
-          <Box sx={{ mt: 1, width: '100%' }}>
-            <Box sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 0,
-              width: '100%',
-              alignItems: 'stretch',
-            }}>
-              {otherFiles.map((file) => (
-                <Box key={file.id || file.filename} sx={{ width: '100%' }}>
-                  <FilePreview file={file} onPreview={setPreviewFile} />
-                </Box>
-              ))}
-            </Box>
-          </Box>
-        )}
+        <FilePreviews
+          imageFiles={imageFiles}
+          otherFiles={otherFiles}
+          setPreviewFile={setPreviewFile}
+          theme={theme}
+        />
 
         <Divider sx={{ my: 2, borderColor: theme.palette.primary.light, opacity: 0.5 }} />
 
@@ -562,54 +425,13 @@ const PostPreview = ({ post, isPage = false }) => {
           justifyContent="space-between"
           spacing={2}
         >
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={1}
-            sx={{
-              bgcolor: theme.palette.background.default,
-              borderRadius: 2,
-              px: 1.5,
-              py: 0.5,
-              fontWeight: 600,
-              minWidth: 0,
-              flexShrink: 1
-            }}
-          >
-            <Tooltip title="Głosuj w górę">
-              <IconButton
-                size="small"
-                sx={{
-                  color: vote === 1 ? theme.palette.success.dark : theme.palette.success.main,
-                  bgcolor: vote === 1 ? theme.palette.success.light : 'transparent',
-                  borderRadius: 1,
-                  transition: 'background 0.15s, color 0.15s',
-                }}
-                onClick={() => handleVote(1)}
-                disabled={loadingVote}
-              >
-                <FontAwesomeIcon icon={faChevronUp} />
-              </IconButton>
-            </Tooltip>
-            <Typography variant="body2" fontWeight={700} sx={{ color: theme.palette.text.primary }}>
-              {voteCount}
-            </Typography>
-            <Tooltip title="Głosuj w dół">
-              <IconButton
-                size="small"
-                sx={{
-                  color: vote === -1 ? theme.palette.error.dark : theme.palette.error.main,
-                  bgcolor: vote === -1 ? theme.palette.error.light : 'transparent',
-                  borderRadius: 1,
-                  transition: 'background 0.15s, color 0.15s',
-                }}
-                onClick={() => handleVote(-1)}
-                disabled={loadingVote}
-              >
-                <FontAwesomeIcon icon={faChevronDown} />
-              </IconButton>
-            </Tooltip>
-          </Stack>
+          <VotingBar
+            vote={vote}
+            voteCount={voteCount}
+            loading={loadingVote}
+            onVote={handleVote}
+            theme={theme}
+          />
           {!isPage && (
             <Button
               variant="outlined"

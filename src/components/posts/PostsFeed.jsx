@@ -59,6 +59,13 @@ const PostsFeed = () => {
     setShowCreate(false);
   };
 
+  const handleDeletePost = useCallback(
+    (deletedId) => {
+      setPosts(prev => prev.filter(post => post.id !== deletedId));
+    },
+    [setPosts]
+  );
+
   const renderedPosts = useMemo(() => {
     return posts.map((post) => (
       <ListItem
@@ -66,10 +73,10 @@ const PostsFeed = () => {
         disablePadding
         sx={{ mb: 2 }}
       >
-        <PostPreview post={post} />
+        <PostPreview post={post} onDelete={handleDeletePost}/>
       </ListItem>
     ));
-  }, [posts]);
+  }, [posts, handleDeletePost]);
 
   return (
     <Box

@@ -36,7 +36,7 @@ const FilePreview = ({ file, onPreview }) => {
         },
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, minWidth: 0 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0, flexWrap: 'wrap' }}>
         <InsertDriveFileIcon sx={{ color: theme.palette.primary.main, fontSize: 32 }} />
         <Typography
           variant="body2"
@@ -51,49 +51,51 @@ const FilePreview = ({ file, onPreview }) => {
           {file.filename}
         </Typography>
       </Box>
-      {isPreviewable(file.filename) && (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
+        {isPreviewable(file.filename) && (
+          <Button
+            variant="outlined"
+            size="small"
+            sx={{
+              color: theme.palette.primary.main,
+              borderColor: theme.palette.primary.main,
+              fontWeight: 600,
+              mr: 1,
+              '&:hover': {
+                bgcolor: theme.palette.secondary.main,
+                color: '#fff',
+                borderColor: theme.palette.secondary.main,
+              },
+            }}
+            onClick={() => onPreview({ type: 'iframe', url: fileUrl })}
+          >
+            Podgląd
+          </Button>
+        )}
         <Button
-          variant="outlined"
+          variant="contained"
           size="small"
+          color="primary"
+          startIcon={<DownloadIcon />}
+          href={fileUrl}
+          download
+          target="_blank"
+          rel="noopener noreferrer"
           sx={{
-            color: theme.palette.primary.main,
-            borderColor: theme.palette.primary.main,
             fontWeight: 600,
-            mr: 1,
+            borderRadius: 2,
+            textTransform: 'none',
+            bgcolor: theme.palette.primary.main,
+            color: '#fff',
             '&:hover': {
               bgcolor: theme.palette.secondary.main,
               color: '#fff',
-              borderColor: theme.palette.secondary.main,
             },
           }}
-          onClick={() => onPreview({ type: 'iframe', url: fileUrl })}
         >
-          Podgląd
+          Pobierz
         </Button>
-      )}
-      <Button
-        variant="contained"
-        size="small"
-        color="primary"
-        startIcon={<DownloadIcon />}
-        href={fileUrl}
-        download
-        target="_blank"
-        rel="noopener noreferrer"
-        sx={{
-          fontWeight: 600,
-          borderRadius: 2,
-          textTransform: 'none',
-          bgcolor: theme.palette.primary.main,
-          color: '#fff',
-          '&:hover': {
-            bgcolor: theme.palette.secondary.main,
-            color: '#fff',
-          },
-        }}
-      >
-        Pobierz
-      </Button>
+      </Box>
     </Paper>
   );
 };

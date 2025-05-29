@@ -1,10 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useCallback } from "react";
 import useAxiosPrivate from "./useAxiosPrivate";
+import useSocket from "./useSocket";
 import useSocketEvent from "./useSocketEvent";
 
-const useComments = (postId, socket) => {
+const useComments = (postId) => {
   const axiosPrivate = useAxiosPrivate();
+  const socket = useSocket("/comments");
 
   const [comments, setComments] = useState([]);
   const [hasMore, setHasMore] = useState(true);
@@ -62,6 +64,7 @@ const useComments = (postId, socket) => {
     hasMore,
     isFetching,
     error,
+    setComments,
   };
 };
 

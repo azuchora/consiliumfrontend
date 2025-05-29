@@ -33,7 +33,8 @@ const PostPage = () => {
     isFetching,
     error: commentsError,
     fetchComments,
-  } = useComments(id, socket);
+    setComments,
+  } = useComments(id);
 
   useEffect(() => {
     if (!socket) return;
@@ -57,6 +58,10 @@ const PostPage = () => {
     }
   };
 
+  const handleDeleteComment = (deletedId) => {
+    setComments(prev => prev.filter(c => c.id !== deletedId));
+  }
+
   if (isLoading) return <Loader />;
   if (postError) return <ErrorMessage message={postError} />;
 
@@ -75,7 +80,7 @@ const PostPage = () => {
         </IconButton>
       </Box>
       <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 }, mb: 4 }}>
-        <PostPreview post={post} isPage={true} />
+        <PostPreview post={post} isPage={true} onDelete={() => navigate('/posts')}/>
       </Paper>
       <Paper elevation={2} sx={{ p: { xs: 2, sm: 4 } }}>
         <Box sx={{ mb: 3 }}>
@@ -104,7 +109,7 @@ const PostPage = () => {
             ) : (
               comments.map((comment) => (
                 <ListItem key={comment.id} disableGutters sx={{ display: "block", px: 0 }}>
-                  <CommentPreview comment={comment} socket={socket} />
+                  <CommentPreview comment={comment} onDelete={handleDeleteComment}/>
                 </ListItem>
               ))
             )}
