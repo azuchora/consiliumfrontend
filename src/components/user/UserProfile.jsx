@@ -31,7 +31,6 @@ import { ROLES } from "../../constants/roles";
 import usePostsFetcher from "../../hooks/usePostsFetcher";
 import InfiniteScroll from "react-infinite-scroll-component";
 import EditProfile from "./EditProfile";
-import MissingPage from "../../pages/MissingPage";
 
 const getRoleNames = (roleIds) => {
   if (!Array.isArray(roleIds)) return [];
@@ -54,6 +53,7 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
   const [showPosts, setShowPosts] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
 
   const {
     posts,
@@ -105,11 +105,30 @@ const UserProfile = () => {
   const roleNames = useMemo(() => getRoleNames(user?.roles), [user]);
 
   const canEdit = authedUsername && authedUsername === user?.username;
+  const canFollow = authedUsername && user && authedUsername !== user.username;
 
   const avatarUrl =
     user?.files && user.files.length > 0
       ? `${BACKEND_URL}/static/${user.files[0].filename}`
       : undefined;
+
+  const handleFollowToggle = async () => {
+    if (!user) return;
+    setFollowLoading(true);
+    try {
+      if (user.isFollowed) {
+        await axiosPrivate.delete(`/users/${user.id}/follow`);
+        setUser((prev) => prev && { ...prev, isFollowed: false });
+      } else {
+        await axiosPrivate.post(`/users/${user.id}/follow`);
+        setUser((prev) => prev && { ...prev, isFollowed: true });
+      }
+    } catch (e) {
+      
+    } finally {
+      setFollowLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -201,7 +220,7 @@ const UserProfile = () => {
             >
               @{user.username}
             </Typography>
-            <Stack direction="row" spacing={1} sx={{ mb: 1, flexWrap: "wrap"}}>
+            <Stack direction="row" sx={{ mb: 1, flexWrap: "wrap", gap: 1 }}>
               <Chip
                 label={`ID: ${user.id}`}
                 size="small"
@@ -244,10 +263,28 @@ const UserProfile = () => {
                     color: "#fff",
                     borderColor: theme.palette.secondary.main,
                   },
+                  mr: 2,
                 }}
                 onClick={() => setEditOpen(true)}
               >
                 Edytuj profil
+              </Button>
+            )}
+
+            {canFollow && (
+              <Button
+                variant={user.isFollowed ? "contained" : "outlined"}
+                color={user.isFollowed ? "secondary" : "primary"}
+                sx={{
+                  borderRadius: 2,
+                  fontWeight: 600,
+                  ml: canEdit ? 2 : 0,
+                  minWidth: 120,
+                }}
+                disabled={followLoading}
+                onClick={handleFollowToggle}
+              >
+                {user.isFollowed ? "Obserwujesz" : "Obserwuj"}
               </Button>
             )}
           </Box>

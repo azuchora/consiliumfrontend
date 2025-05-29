@@ -10,6 +10,8 @@ import {
   Box,
   List,
   ListItem,
+  ListItemAvatar,
+  Avatar,
   ListItemText,
   CircularProgress,
   Slide,
@@ -21,6 +23,67 @@ import useNotifications from "../../hooks/useNotifications";
 import InfiniteScroll from "react-infinite-scroll-component";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
+import { BACKEND_URL } from "../../api/axios";
+import useFormatDate from "../../hooks/useFormatDate";
+
+const getNotificationMessage = (notification, onUsernameClick) => {
+  const { type, metadata } = notification;
+  const { username } = metadata || {};
+
+  const usernameNode = (
+    <span
+      style={{ color: "#1976d2", cursor: "pointer", fontWeight: 600 }}
+      onClick={e => {
+        e.stopPropagation();
+        onUsernameClick(username);
+      }}
+    >
+      @{username}
+    </span>
+  );
+
+  const isPostFollower = metadata?.isFollower;
+  
+  switch (type) {
+    case "new_comment":
+      return isPostFollower ? (
+        <>{usernameNode} skomentował(a) obserwowany post</>
+      ) : (
+        <>{usernameNode} skomentował(a) Twój post</>
+      )
+    case "comment_reply":
+      return <>{usernameNode} odpowiedział(a) na Twój komentarz</>;
+    case "new_post":
+      return <>{usernameNode} dodał(a) nowy post</>;
+    case "post_voted":
+      return <>{usernameNode} zagłosował(a) na Twój post</>;
+    default:
+      return <>Nowa aktywność od {usernameNode}</>;
+  }
+};
+
+const getAvatarUrl = (notification) => {
+  const { metadata } = notification;
+  if (!metadata?.avatarFilename) return undefined;
+  return `${BACKEND_URL}/static/${metadata.avatarFilename}`;
+};
+
+const getNotificationUrl = (notification) => {
+  const { type, metadata } = notification;
+  switch (type) {
+    case "new_comment":
+      return `/posts/${metadata.postId}`;
+    case "comment_reply":
+      return `/comments/${metadata.commentId}`;
+    case "new_post":
+      return `/posts/${metadata.postId}`;
+    case "post_voted":
+      return `/posts/${metadata.postId}`;
+    default:
+      return "/";
+  }
+};
 
 const NotificationBell = ({ mobile = false }) => {
   const { isAuthed } = useAuth();
@@ -38,8 +101,11 @@ const NotificationBell = ({ mobile = false }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const notificationsScrollRef = useRef();
 
+  const formatDate = useFormatDate();
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const navigate = useNavigate();
 
   const handleOpen = (event) => {
     if (isMobile) {
@@ -82,6 +148,11 @@ const NotificationBell = ({ mobile = false }) => {
 
   if (!isAuthed()) return null;
 
+  const handleUsernameClick = (username) => {
+    handleClose();
+    navigate(`/users/${username}`);
+  };
+
   const NotificationList = (
     <Box
       id="notifications-scroll"
@@ -118,31 +189,69 @@ const NotificationBell = ({ mobile = false }) => {
               Brak powiadomień
             </Typography>
           ) : (
-            notifications.map((n) => (
-              <ListItem
-                key={n.id}
-                sx={{
-                  borderBottom: "1px solid #eee",
-                  bgcolor: n.read ? "#fff" : "#e3f2fd",
-                  py: 1.5,
-                  px: 2,
-                  alignItems: "flex-start",
-                }}
-              >
-                <ListItemText
-                  primary={n.title || n.content || "Nowe powiadomienie"}
-                  secondary={n.createdAt ? new Date(n.createdAt).toLocaleString() : ""}
-                  primaryTypographyProps={{
-                    fontWeight: n.read ? 400 : 600,
-                    color: n.read ? "#333" : "#1976d2",
+            notifications.map((n) => {
+              const avatarUrl = getAvatarUrl(n);
+              const initial =
+                n.metadata?.username?.[0]?.toUpperCase() || "?";
+              return (
+                <ListItem
+                  key={n.id}
+                  button
+                  onClick={() => {
+                    const url = getNotificationUrl(n);
+                    handleClose();
+                    navigate(url);
                   }}
-                  secondaryTypographyProps={{
-                    fontSize: "0.85rem",
-                    color: "#888",
+                  sx={{
+                    borderBottom: "1px solid #eee",
+                    bgcolor: n.read ? "#fff" : "#e3f2fd",
+                    py: 1.5,
+                    px: 2,
+                    alignItems: "center",
+                    cursor: "pointer",
+                    transition: "background 0.2s",
+                    "&:hover": { bgcolor: "#e3f2fd" },
                   }}
-                />
-              </ListItem>
-            ))
+                >
+                  <ListItemAvatar sx={{ minWidth: 0, mr: 2 }}>
+                    <Avatar
+                      src={avatarUrl}
+                      alt={n.metadata?.username || ""}
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        bgcolor: theme.palette.primary.main,
+                        color: "#fff",
+                        fontWeight: 700,
+                        fontSize: 22,
+                        border: `2px solid ${theme.palette.secondary.main}`,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {!avatarUrl && initial}
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={getNotificationMessage(n, handleUsernameClick)}
+                    secondary={
+                      n.createdAt
+                        ? formatDate(n.createdAt)
+                        : ""
+                    }
+                    primaryTypographyProps={{
+                      fontWeight: n.read ? 400 : 600,
+                      color: n.read ? "#333" : "#1976d2",
+                      sx: { ml: 0 },
+                    }}
+                    secondaryTypographyProps={{
+                      fontSize: "0.85rem",
+                      color: "#888",
+                      sx: { ml: 0 },
+                    }}
+                  />
+                </ListItem>
+              );
+            })
           )}
         </List>
       </InfiniteScroll>
@@ -205,7 +314,6 @@ const NotificationBell = ({ mobile = false }) => {
         fullScreen
         open={dialogOpen && isMobile}
         onClose={handleClose}
-        disableScrollLock
         TransitionComponent={Slide}
         TransitionProps={{ direction: "up" }}
         PaperProps={{
