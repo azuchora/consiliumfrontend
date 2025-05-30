@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faComments, faFolderOpen, faShieldAlt } from '@fortawesome/free-solid-svg-icons';
+import { faComments, faFolderOpen, faShieldAlt, faUserMd, faLightbulb, faLock, faUsers, faChartLine } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -10,24 +10,61 @@ import {
   useTheme,
   useMediaQuery,
   Container,
+  Divider,
 } from '@mui/material';
 
 const features = [
   {
     icon: faComments,
     title: 'Dyskusje specjalistyczne',
-    text: 'Dołącz do konwersacji z lekarzami z różnych dziedzin i konsultuj trudne przypadki.'
+    text: 'Dołącz do konwersacji z lekarzami z różnych dziedzin i konsultuj trudne przypadki. Otrzymuj szybkie odpowiedzi na nurtujące pytania kliniczne.'
   },
   {
     icon: faFolderOpen,
     title: 'Archiwum przypadków',
-    text: 'Przeglądaj zarchiwizowane przypadki i ucz się na podstawie doświadczeń innych.'
+    text: 'Przeglądaj zarchiwizowane przypadki i ucz się na podstawie doświadczeń innych. Wyszukuj interesujące Cię tematy i rozwiązania.'
   },
   {
     icon: faShieldAlt,
-    title: 'Automatyczna cenzura danych wrażliwych',
-    text: 'Automatyczna cenzura danych wrażliwych na zdjęciach i plikach tekstowych.'
+    title: 'Ochrona danych',
+    text: 'Automatyczna cenzura danych wrażliwych na zdjęciach i plikach tekstowych oraz pełna zgodność z RODO.'
+  },
+  {
+    icon: faUserMd,
+    title: 'Zweryfikowana społeczność',
+    text: 'Dostęp mają wyłącznie zweryfikowani lekarze, co zapewnia wysoki poziom merytoryczny i bezpieczeństwo dyskusji.'
+  },
+  {
+    icon: faLightbulb,
+    title: 'Wymiana wiedzy i mentoring',
+    text: 'Zadawaj pytania, dziel się doświadczeniem, pomagaj innym i korzystaj z mentoringu bardziej doświadczonych kolegów.'
+  },
+  {
+    icon: faLock,
+    title: 'Prywatność i bezpieczeństwo',
+    text: 'Twoje dane są bezpieczne, a wszystkie dyskusje są chronione i dostępne tylko dla uprawnionych użytkowników. Brak reklam i komercyjnych treści.'
+  },
+  {
+    icon: faUsers,
+    title: 'Budowanie sieci kontaktów',
+    text: 'Nawiązuj kontakty, współpracuj z lekarzami z całej Polski i rozwijaj swoją zawodową społeczność.'
+  },
+  {
+    icon: faChartLine,
+    title: 'Rozwój zawodowy',
+    text: 'Bądź na bieżąco z nowościami, trendami i rzadkimi przypadkami klinicznymi. Zyskaj dostęp do unikalnych materiałów edukacyjnych.'
   }
+];
+
+const benefits = [
+  "Dostęp do zamkniętej, zweryfikowanej społeczności lekarzy.",
+  "Możliwość konsultacji trudnych przypadków i uzyskania opinii ekspertów.",
+  "Bezpieczne środowisko – ochrona danych pacjentów i użytkowników.",
+  "Brak reklam, komercyjnych treści i spamu.",
+  "Wygodne archiwum przypadków i szybkie wyszukiwanie tematów.",
+  "Możliwość rozwoju zawodowego i zdobywania nowych kontaktów.",
+  "Wsparcie mentoringowe i wymiana doświadczeń między specjalistami.",
+  "Nowoczesna, intuicyjna platforma dostępna na komputerze i urządzeniach mobilnych."
 ];
 
 const HomePage = () => {
@@ -141,8 +178,26 @@ const HomePage = () => {
               overflowWrap: 'break-word',
             }}
           >
-            Wymieniaj się wiedzą, pytaj, konsultuj przypadki, ucz się razem z innymi specjalistami.
+            Wymieniaj się wiedzą, pytaj, konsultuj przypadki, ucz się razem z innymi specjalistami. 
+            Nasza platforma została stworzona z myślą o lekarzach, którzy chcą rozwijać swoje kompetencje, dzielić się doświadczeniem i wspólnie rozwiązywać trudne przypadki kliniczne.
           </Typography>
+          <Divider sx={{ my: 2 }} />
+          <Typography
+            variant="h5"
+            sx={{
+              color: theme.palette.primary.main,
+              fontWeight: 700,
+              mb: 1,
+              fontSize: { xs: '1.1rem', sm: '1.25rem' }
+            }}
+          >
+            Dlaczego warto do nas dołączyć?
+          </Typography>
+          <ul style={{ textAlign: 'left', margin: '12px auto 20px auto', maxWidth: 650, color: theme.palette.text.secondary, fontSize: '1rem', lineHeight: 1.7 }}>
+            {benefits.map((benefit, idx) => (
+              <li key={idx}>{benefit}</li>
+            ))}
+          </ul>
           <Button
             variant="contained"
             color="secondary"
@@ -165,6 +220,20 @@ const HomePage = () => {
             Przejdź do forum
           </Button>
         </Paper>
+
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 700,
+            color: theme.palette.primary.main,
+            mb: 3,
+            textAlign: 'center',
+            width: '100%',
+            overflowWrap: 'break-word',
+          }}
+        >
+          Najważniejsze funkcje platformy
+        </Typography>
 
         <Grid
           container
@@ -248,6 +317,39 @@ const HomePage = () => {
             </Grid>
           ))}
         </Grid>
+
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 2, sm: 3 },
+            mt: 2,
+            borderRadius: 3,
+            background: theme.palette.background.paper,
+            width: '100%',
+            textAlign: 'center',
+            color: theme.palette.text.secondary,
+            fontSize: { xs: '0.95rem', sm: '1.05rem' },
+            boxShadow: 'none',
+          }}
+        >
+          <Typography variant="body2" sx={{ mb: 1 }}>
+            Masz pytania lub chcesz zgłosić sugestię? Skontaktuj się z nami przez formularz kontaktowy lub napisz na adres <b>kontakt@consilium.pl</b>.
+          </Typography>
+          <Button
+            variant="outlined"
+            color="primary"
+            sx={{
+              mt: 1,
+              borderRadius: 2,
+              fontWeight: 600,
+              px: 3,
+              py: 1,
+            }}
+            onClick={() => navigate('/contact')}
+          >
+            Kontakt
+          </Button>
+        </Paper>
       </Container>
     </Box>
   );

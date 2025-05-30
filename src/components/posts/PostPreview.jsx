@@ -148,7 +148,7 @@ const PostPreview = ({ post, isPage = false, onDelete }) => {
             minHeight: 48,
             width: '100%',
             flexWrap: 'nowrap',
-            overflow: 'visible'
+            overflow: 'visible',
           }}
         >
           <AuthorInfo

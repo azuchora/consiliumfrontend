@@ -32,11 +32,12 @@ const AuthorInfo = ({ user, avatar, initial, date, theme, isMobile }) => (
           fontWeight: 600,
           "&:hover": { color: theme.palette.primary.main },
           wordBreak: 'break-word',
+          fontSize: '1.1em',
         }}
       >
         {`${user.name} ${user.surname}`}
       </Typography>
-      <Typography variant="caption" color="text.secondary" display="block">
+      <Typography variant="caption" color="text.secondary" display="block" sx={{ fontSize: '0.8em' }}>
         {date}
       </Typography>
     </Box>

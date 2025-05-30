@@ -65,7 +65,12 @@ const Navbar = () => {
 
   return (
     <>
-      <AppBar position="static" color="primary" elevation={2}>
+      <AppBar
+        position="fixed"
+        color="primary"
+        elevation={2}
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      >
         <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 1, sm: 2 } }}>
           <Typography
             variant="h6"
@@ -203,6 +208,7 @@ const Navbar = () => {
         anchor="right"
         open={drawerOpen}
         onClose={handleDrawerToggle}
+        disableScrollLock
         PaperProps={{
           sx: { width: 260, bgcolor: theme.palette.primary.main, color: '#fff' }
         }}

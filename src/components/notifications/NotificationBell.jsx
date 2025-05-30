@@ -107,6 +107,13 @@ const NotificationBell = ({ mobile = false }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (isAuthed()) {
+      fetchNotifications(null, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthed]);
+
   const handleOpen = (event) => {
     if (isMobile) {
       setDialogOpen(true);
@@ -127,24 +134,6 @@ const NotificationBell = ({ mobile = false }) => {
       fetchNotifications(before, false);
     }
   };
-
-  useEffect(() => {
-    if (!anchorEl || isMobile) return;
-
-    const handleScroll = (e) => {
-      if (
-        notificationsScrollRef.current &&
-        notificationsScrollRef.current.contains(e.target)
-      ) {
-        return;
-      }
-      setAnchorEl(null);
-      markAllAsRead();
-    };
-
-    window.addEventListener("scroll", handleScroll, true);
-    return () => window.removeEventListener("scroll", handleScroll, true);
-  }, [anchorEl, markAllAsRead, isMobile]);
 
   if (!isAuthed()) return null;
 
