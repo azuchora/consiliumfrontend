@@ -7,7 +7,7 @@ const PreviewModal = ({ previewFile, onClose }) => {
   if (!previewFile) return null;
 
   return (
-    <Modal open={!!previewFile} onClose={onClose}>
+    <Modal open={!!previewFile} onClose={onClose} disableScrollLock>
       <Box
         sx={{
           position: 'fixed',

@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useMemo } from 'react';
 import useSocketPrivate from '../hooks/useSocketPrivate';
+import useAuth from '../hooks/useAuth';
 
 export const SocketContext = createContext({
   sockets: {},
@@ -9,11 +10,15 @@ export const SocketContext = createContext({
 export const SocketProvider = ({ children }) => {
   const commentsSocket = useSocketPrivate('/comments');
   const notificationsSocket = useSocketPrivate('/notifications');
+  const chatSocket = useSocketPrivate('/chat');
+
+  const { auth } = useAuth();
 
   const sockets = useMemo(() => ({
     '/comments': commentsSocket,
     '/notifications': notificationsSocket,
-  }), [commentsSocket, notificationsSocket]);
+    '/chat': chatSocket,
+  }), [commentsSocket, notificationsSocket, chatSocket]);
 
   const [connections, setConnections] = useState({});
 
@@ -53,8 +58,8 @@ export const SocketProvider = ({ children }) => {
         socket.off('disconnect', onDisconnect);
       });
     };
-  }, [sockets]);
-
+  }, [sockets, auth?.id]);
+  
   return (
     <SocketContext.Provider value={{ sockets, connections }}>
       {children}

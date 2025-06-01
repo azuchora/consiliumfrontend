@@ -32,6 +32,8 @@ import usePostsFetcher from "../../hooks/usePostsFetcher";
 import InfiniteScroll from "react-infinite-scroll-component";
 import EditProfile from "./EditProfile";
 import useFollow from "../../hooks/useFollow";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import ChatMenu from "../chat/ChatMenu";
 
 const getRoleNames = (roleIds) => {
   if (!Array.isArray(roleIds)) return [];
@@ -46,7 +48,7 @@ const UserProfile = () => {
   const { username } = useParams();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const { username: authedUsername } = useAuth();
+  const { auth } = useAuth();
   const navigate = useNavigate();
 
   const { user, loading, fetchUser } = useUser(username);
@@ -62,10 +64,14 @@ const UserProfile = () => {
     resetPosts,
     setPosts,
   } = usePostsFetcher({ username });
-
+  
   const { followed, followLoading, handleFollowToggle, setFollowed } = useFollow(user, "user");
 
-  // eslint-disable-next-line
+  // Chat state
+  const axiosPrivate = useAxiosPrivate();
+  const [chatOpen, setChatOpen] = useState(false);
+  const [initialConversation, setInitialConversation] = useState(null);
+
   useEffect(() => {
     resetPosts();
     fetchPosts(null, true);
@@ -88,8 +94,11 @@ const UserProfile = () => {
 
   const roleNames = useMemo(() => getRoleNames(user?.roles), [user]);
 
+  const authedUsername = auth?.username;
+  const authedId = auth?.id;
   const canEdit = authedUsername && authedUsername === user?.username;
   const canFollow = authedUsername && user && authedUsername !== user.username;
+  const canChat = authedId && user && authedId !== user.id;
 
   const avatarUrl =
     user?.files && user.files.length > 0
@@ -98,6 +107,17 @@ const UserProfile = () => {
 
   const handlePostDeleted = (deletedId) => {
     setPosts(prev => prev.filter(p => p.id !== deletedId));
+  };
+
+  // Start chat with this user
+  const handleStartChat = async () => {
+    try {
+      const res = await axiosPrivate.post("/conversations", { userId: user.id });
+      setInitialConversation(res.data.conversation);
+      setChatOpen(true);
+    } catch (e) {
+      // Optionally show error
+    }
   };
 
   if (loading) {
@@ -257,6 +277,22 @@ const UserProfile = () => {
                 {followed ? "Obserwujesz" : "Obserwuj"}
               </Button>
             )}
+
+            {canChat && (
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{
+                  borderRadius: 2,
+                  fontWeight: 600,
+                  ml: 2,
+                  minWidth: 120,
+                }}
+                onClick={handleStartChat}
+              >
+                Rozpocznij czat
+              </Button>
+            )}
           </Box>
         </Stack>
       </Paper>
@@ -358,6 +394,14 @@ const UserProfile = () => {
           <EditProfile user={user} onClose={() => setEditOpen(false)} onUpdated={handleProfileUpdated} />
         </DialogContent>
       </Dialog>
+
+      {/* ChatMenu for starting conversation */}
+      <ChatMenu
+        open={chatOpen}
+        onClose={() => setChatOpen(false)}
+        mobile={isMobile}
+        initialConversation={initialConversation}
+      />
     </Box>
   );
 };

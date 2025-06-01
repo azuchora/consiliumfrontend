@@ -32,15 +32,16 @@ const getNotificationMessage = (notification, onUsernameClick) => {
   const { username } = metadata || {};
 
   const usernameNode = (
-    <span
-      style={{ color: "#1976d2", cursor: "pointer", fontWeight: 600 }}
+    <Box
+      component="span"
+      sx={{ color: "#1976d2", cursor: "pointer", fontWeight: 600, display: "inline" }}
       onClick={e => {
         e.stopPropagation();
         onUsernameClick(username);
       }}
     >
       @{username}
-    </span>
+    </Box>
   );
 
   const isPostFollower = metadata?.isFollower;
@@ -72,10 +73,9 @@ const getAvatarUrl = (notification) => {
 const getNotificationUrl = (notification) => {
   const { type, metadata } = notification;
   switch (type) {
+    case "comment_reply":
     case "new_comment":
       return `/posts/${metadata.postId}`;
-    case "comment_reply":
-      return `/comments/${metadata.commentId}`;
     case "new_post":
       return `/posts/${metadata.postId}`;
     case "post_voted":
@@ -182,6 +182,7 @@ const NotificationBell = ({ mobile = false }) => {
               const avatarUrl = getAvatarUrl(n);
               const initial =
                 n.metadata?.username?.[0]?.toUpperCase() || "?";
+              if (n.type === "new_message") return null;
               return (
                 <ListItem
                   key={n.id}
@@ -303,6 +304,7 @@ const NotificationBell = ({ mobile = false }) => {
         fullScreen
         open={dialogOpen && isMobile}
         onClose={handleClose}
+        disableScrollLock
         TransitionComponent={Slide}
         TransitionProps={{ direction: "up" }}
         PaperProps={{

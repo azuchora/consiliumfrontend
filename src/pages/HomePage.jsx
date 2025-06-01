@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComments, faFolderOpen, faShieldAlt, faUserMd, faLightbulb, faLock, faUsers, faChartLine } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
+import CheckIcon from '@mui/icons-material/Check';
 import {
   Box,
   Typography,
@@ -11,6 +12,10 @@ import {
   useMediaQuery,
   Container,
   Divider,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 
 const features = [
@@ -193,11 +198,27 @@ const HomePage = () => {
           >
             Dlaczego warto do nas dołączyć?
           </Typography>
-          <ul style={{ textAlign: 'left', margin: '12px auto 20px auto', maxWidth: 650, color: theme.palette.text.secondary, fontSize: '1rem', lineHeight: 1.7 }}>
+          <List
+            sx={{
+              textAlign: 'left',
+              margin: '12px auto 20px auto',
+              maxWidth: 650,
+              color: theme.palette.text.secondary,
+              fontSize: '1rem',
+              lineHeight: 1.7,
+              width: '100%',
+              pl: 0,
+            }}  
+          >
             {benefits.map((benefit, idx) => (
-              <li key={idx}>{benefit}</li>
+              <ListItem key={idx} sx={{ display: 'flex', alignItems: 'flex-start', py: 0.5, pl: 0 }}>
+                <ListItemIcon sx={{ minWidth: 32, mt: 0.3 }}>
+                  <CheckIcon color="primary" fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary={benefit} primaryTypographyProps={{ fontSize: '1rem' }} />
+              </ListItem>
             ))}
-          </ul>
+          </List>
           <Button
             variant="contained"
             color="secondary"
@@ -332,7 +353,7 @@ const HomePage = () => {
             boxShadow: 'none',
           }}
         >
-          <Typography variant="body2" sx={{ mb: 1 }}>
+          <Typography variant="body2" sx={{ mb: 1, mt: 1 }}>
             Masz pytania lub chcesz zgłosić sugestię? Skontaktuj się z nami przez formularz kontaktowy lub napisz na adres <b>kontakt@consilium.pl</b>.
           </Typography>
           <Button

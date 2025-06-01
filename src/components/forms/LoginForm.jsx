@@ -55,10 +55,10 @@ const LoginForm = () => {
       );
 
       const accessToken = response?.data?.accessToken;
-      const uid = response?.data?.id;
+      const id = response?.data?.id;
       const avatarFilename = response?.data?.avatarFilename;
       const roles = response?.data?.roles;
-      setAuth({ user, uid, avatarFilename, roles, accessToken });
+      setAuth({ user, id, avatarFilename, roles, accessToken });
       setAvatar(avatarFilename);
       setUsername(user);
       setUser('');

@@ -69,7 +69,7 @@ const PostPreview = ({ post, isPage = false, onDelete }) => {
     initialCount: totalVotes,
     onVote: async (value) => axiosPrivate.put(`/posts/${post.id}/vote`, { value }),
   });
-
+  
   const {
     deleteDialogOpen,
     setDeleteDialogOpen,
@@ -91,7 +91,7 @@ const PostPreview = ({ post, isPage = false, onDelete }) => {
 
   const age = post.age;
   const gender = post.gender ? genderMap[post.gender] || post.gender : null;
-
+  
   return (
     <>
       <Paper

@@ -4,7 +4,7 @@ import useAuth from '../../hooks/useAuth';
 import useLogout from '../../hooks/useLogout';
 import { BACKEND_URL } from '../../api/axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignInAlt, faUserPlus, faBars, faTimes, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faSignInAlt, faUserPlus, faBars, faTimes, faCog, faComments } from '@fortawesome/free-solid-svg-icons';
 import {
   AppBar,
   Toolbar,
@@ -25,6 +25,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import NotificationBell from '../notifications/NotificationBell';
+import ChatMenu from '../chat/ChatMenu';
 
 const Navbar = () => {
   const { isAuthed, username, avatar, isVerified } = useAuth();
@@ -33,6 +34,7 @@ const Navbar = () => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -102,7 +104,18 @@ const Navbar = () => {
             )}
 
             {isAuthed() && (
-              <NotificationBell mobile={isMobile} />
+              <>
+                <NotificationBell mobile={isMobile} />
+                <IconButton
+                  color="inherit"
+                  onClick={() => setChatOpen(prev => !prev)}
+                  aria-label="Czaty"
+                  sx={{ ml: 1 }}
+                >
+                  <FontAwesomeIcon icon={faComments} />
+                </IconButton>
+                <ChatMenu open={chatOpen} onClose={() => setChatOpen(false)} mobile={isMobile} />
+              </>
             )}
 
             {!isMobile && (
@@ -210,16 +223,16 @@ const Navbar = () => {
         onClose={handleDrawerToggle}
         disableScrollLock
         PaperProps={{
-          sx: { width: 260, bgcolor: theme.palette.primary.main, color: '#fff' }
+          sx: { width: 200, bgcolor: theme.palette.primary.main, color: '#fff' }
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 2, pb: 0 }}>
-          <Typography variant="h6" sx={{ flexGrow: 1, color: '#fff', fontWeight: 700 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', p: 2, pb: 0, mt: 4 }}>
+          {/* <Typography variant="h6" sx={{ flexGrow: 1, color: '#fff', fontWeight: 700 }}>
             Consilium
           </Typography>
           <IconButton onClick={handleDrawerToggle} sx={{ color: '#fff' }}>
             <FontAwesomeIcon icon={faTimes} />
-          </IconButton>
+          </IconButton> */}
         </Box>
         <Divider sx={{ bgcolor: 'rgba(255,255,255,0.2)', my: 1 }} />
         <List>
