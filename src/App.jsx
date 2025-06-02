@@ -14,6 +14,8 @@ import "./App.css";
 import PostPage from './pages/PostPage';
 import UserProfilePage from './pages/UserProfilePage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import SetPasswordPage from './pages/SetPasswordPage';
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
         {/* Public */}
         <Route path='register' element={<RegisterPage />} />   
         <Route path='unauthorized' element={<UnauthorizedPage />} />
+        <Route path='reset-password' element={<ResetPasswordPage />} />
+        <Route path='reset-password/:token' element={<SetPasswordPage />} />
         <Route path='/' element={<HomePage />} />
 
         <Route path='*' element={<MissingPage />} />

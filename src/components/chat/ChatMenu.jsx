@@ -9,9 +9,11 @@ import {
   useTheme,
   CircularProgress,
   Slide,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faTimes, faArrowLeft, faEllipsisV, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ChatList, MessageList, Input } from "react-chat-elements";
 import "react-chat-elements/dist/main.css";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -21,11 +23,14 @@ import useAuth from "../../hooks/useAuth";
 import useConversations from "../../hooks/useConversations";
 import useMessages from "../../hooks/useMessages";
 import { BACKEND_URL } from "../../api/axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 const ChatMenu = ({ open, onClose, mobile }) => {
   const theme = useTheme();
   const { auth } = useAuth();
+
+  const axiosPrivate = useAxiosPrivate();
 
   const {
     conversations,
@@ -51,6 +56,9 @@ const ChatMenu = ({ open, onClose, mobile }) => {
     setHasMore,
   } = useMessages(selectedConv);
 
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedMsgId, setSelectedMsgId] = useState(null);
+
   useEffect(() => {
     if (open && auth?.id) fetchConversations();
   }, [open, fetchConversations, auth?.id]);
@@ -63,6 +71,25 @@ const ChatMenu = ({ open, onClose, mobile }) => {
       setMessages([]);
     }
   }, [selectedConv, fetchMessages, setMessages, setHasMore, auth?.id]);
+
+  const handleMenuOpen = (event, msgId) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedMsgId(msgId);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedMsgId(null);
+  };
+
+  const handleDeleteMessage = async () => {
+    if (!selectedMsgId) return;
+    handleMenuClose();
+    try {
+      await axiosPrivate.delete(`/messages/${selectedMsgId}`);
+      setMessages((prev) => prev.filter((msg) => msg.id !== selectedMsgId));
+    } catch {}
+  };
 
   if (!auth?.id) {
     return (
@@ -102,7 +129,26 @@ const ChatMenu = ({ open, onClose, mobile }) => {
   const messageListItems = messages.map((msg) => ({
     position: msg.senderId === auth.id ? "right" : "left",
     type: "text",
-    text: msg.content,
+    text: (
+      <Box sx={{ position: "relative", minHeight: 24 }}>
+        <span style={{ display: "inline-block", paddingRight: 32 }}>{msg.content}</span>
+        {msg.senderId === auth.id && (
+          <IconButton
+            size="small"
+            sx={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              p: 0.5,
+              zIndex: 2,
+            }}
+            onClick={(e) => handleMenuOpen(e, msg.id)}
+          >
+            <FontAwesomeIcon icon={faEllipsisV} fontSize={14} />
+          </IconButton>
+        )}
+      </Box>
+    ),
     title: undefined,
     status: msg.read ? "read" : "waiting",
     date: new Date(msg.createdAt),
@@ -231,6 +277,18 @@ const ChatMenu = ({ open, onClose, mobile }) => {
             />
             <div ref={messagesEndRef} />
           </InfiniteScroll>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            transformOrigin={{ vertical: "top", horizontal: "right" }}
+          >
+            <MenuItem onClick={handleDeleteMessage}>
+              <FontAwesomeIcon icon={faTrash} style={{ marginRight: 8 }} />
+              Usuń wiadomość
+            </MenuItem>
+          </Menu>
         </Box>
       ) : (
         <Box sx={{

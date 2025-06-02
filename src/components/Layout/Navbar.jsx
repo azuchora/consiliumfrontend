@@ -205,7 +205,15 @@ const Navbar = () => {
                     <MenuItem onClick={() => { navigate('/change-password'); handleMenuClose(); }}>
                       Zmień hasło
                     </MenuItem>
-                    <MenuItem onClick={handleLogout}>Wyloguj</MenuItem>
+                    <MenuItem 
+                      onClick={handleLogout}
+                      sx={{
+                        color: theme.palette.error.main,
+                        '&:hover': { bgcolor: theme.palette.error.main, color: '#fff' },
+                      }}
+                    >
+                      Wyloguj
+                    </MenuItem>
                   </Menu>
                 </>
               )
@@ -298,7 +306,7 @@ const Navbar = () => {
                 sx={{ color: '#fff', borderRadius: 1, mb: 1 }}
                 button
               >
-                <ListItemText primary="Strona główna" />
+                <ListItemText primary="Strona główna" button/>
               </ListItem>
               <ListItem
                 component={Link}
@@ -307,9 +315,9 @@ const Navbar = () => {
                 sx={{ color: '#fff', borderRadius: 1, mb: 1 }}
                 button
               >
-                <ListItemText primary="Forum" />
+                <ListItemText primary="Forum" button/>
               </ListItem>
-              
+              <Divider sx={{ bgcolor: 'rgba(255,255,255,0.2)', my: 1 }} />
               {!isVerified() && (
                 <ListItem
                   component={Link}
@@ -323,6 +331,9 @@ const Navbar = () => {
               )}
                 <ListItem
                   button
+                  sx={{
+                    cursor: 'pointer',
+                  }}
                   onClick={() => {
                     navigate('/change-password');
                     handleDrawerToggle();
@@ -334,6 +345,7 @@ const Navbar = () => {
                 onClick={handleLogout}
                 sx={{
                   color: theme.palette.error.main,
+                  cursor: 'pointer',
                   borderRadius: 1,
                   mt: 1,
                   '&:hover': { bgcolor: theme.palette.error.main, color: '#fff' }

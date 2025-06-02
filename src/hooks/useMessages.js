@@ -70,6 +70,14 @@ const useMessages = (selectedConv) => {
     chatSocket
   );
 
+  useSocketEvent(
+    "chatDelete",
+    (data) => {
+      setMessages((prev) => prev.filter((msg) => msg.id !== data.id));
+    },
+    chatSocket
+  );
+
   const fetchMoreMessages = useCallback(async () => {
     if (!selectedConv || !hasMore || messages.length === 0) return;
     const oldest = messages[0];

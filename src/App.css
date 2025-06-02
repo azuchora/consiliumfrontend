@@ -16,3 +16,8 @@ html, body, #root {
 body {
     background-color: #f5f7fa;
 }
+
+.rce-container-messages .rce-mbox {
+  transition: none !important;
+  animation: none !important;
+}

@@ -226,7 +226,7 @@ const LoginForm = () => {
             sx={{ mt: 1, color: theme.palette.text.primary }}
           />
         </Box>
-        <Link to='/recover' style={{ color: theme.palette.primary.main, fontWeight: 600, marginTop: 12, marginBottom: 8 }}>
+        <Link to='/reset-password' style={{ color: theme.palette.primary.main, fontWeight: 600, marginTop: 12, marginBottom: 8 }}>
           Nie pamiętasz hasła?
         </Link>
         <Divider sx={{ width: '100%', my: 2, borderColor: theme.palette.primary.light, opacity: 0.5 }} />

@@ -9,29 +9,26 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import useLogout from "../hooks/useLogout";
-import { LENGTH_LIMITS, PASSWORD_REGEX_STR } from '../constants/validation';
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "../api/axios";
+import { LENGTH_LIMITS, PASSWORD_REGEX_STR } from "../constants/validation";
 
 const PASSWORD_REGEX = new RegExp(PASSWORD_REGEX_STR);
 
-const ChangePasswordPage = () => {
+const SetPasswordPage = () => {
   const theme = useTheme();
-  const axiosPrivate = useAxiosPrivate();
-  const logout = useLogout();
+  const navigate = useNavigate();
+  const { token } = useParams();
 
-  const oldPasswordRef = useRef();
   const newPasswordRef = useRef();
   const repeatPasswordRef = useRef();
 
-  const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
 
   const [validPassword, setValidPassword] = useState(false);
   const [validMatch, setValidMatch] = useState(false);
 
-  const [oldPasswordFocus, setOldPasswordFocus] = useState(false);
   const [newPasswordFocus, setNewPasswordFocus] = useState(false);
   const [repeatPasswordFocus, setRepeatPasswordFocus] = useState(false);
 
@@ -47,10 +44,9 @@ const ChangePasswordPage = () => {
   useEffect(() => {
     setError("");
     setSuccess("");
-  }, [oldPassword, newPassword, repeatPassword]);
+  }, [newPassword, repeatPassword]);
 
   const canSubmit =
-    oldPassword &&
     newPassword &&
     repeatPassword &&
     validPassword &&
@@ -62,7 +58,7 @@ const ChangePasswordPage = () => {
     setError("");
     setSuccess("");
 
-    if (!oldPassword || !newPassword || !repeatPassword) {
+    if (!newPassword || !repeatPassword) {
       setError("Wszystkie pola są wymagane.");
       return;
     }
@@ -71,24 +67,24 @@ const ChangePasswordPage = () => {
       return;
     }
     if (!validMatch) {
-      setError("Nowe hasła muszą być takie same.");
+      setError("Hasła muszą być takie same.");
       return;
     }
 
     setLoading(true);
     try {
-      await axiosPrivate.post("/users/change-password", {
-        oldPassword,
+      await axios.post("/users/reset-password", {
+        token,
         newPassword,
       });
-      setSuccess("Hasło zostało zmienione. Za chwilę nastąpi wylogowanie.");
+      setSuccess("Hasło zostało ustawione. Możesz się teraz zalogować. Za chwilę nastąpi przekierowanie do logowania.");
       setTimeout(() => {
-        logout();
-      }, 2000);
+        navigate("/login");
+      }, 5000);
     } catch (err) {
       setError(
         err?.response?.data?.message ||
-          "Błąd podczas zmiany hasła. Spróbuj ponownie."
+          "Błąd podczas resetowania hasła. Link mógł wygasnąć."
       );
     } finally {
       setLoading(false);
@@ -130,13 +126,13 @@ const ChangePasswordPage = () => {
             textAlign: "center",
           }}
         >
-          Zmień hasło
+          Ustaw nowe hasło
         </Typography>
-        {success && (
+        {success ? (
           <Alert severity="success" sx={{ width: "100%", mb: 2 }}>
             {success}
           </Alert>
-        )}
+        ) : (
         <Box
           component="form"
           onSubmit={handleSubmit}
@@ -148,35 +144,6 @@ const ChangePasswordPage = () => {
           }}
         >
           <TextField
-            label="Stare hasło"
-            type="password"
-            inputRef={oldPasswordRef}
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-            onFocus={() => setOldPasswordFocus(true)}
-            onBlur={() => setOldPasswordFocus(false)}
-            required
-            fullWidth
-            variant="outlined"
-            autoComplete="current-password"
-            sx={{
-              bgcolor: "#fff",
-              borderRadius: 1,
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: theme.palette.primary.main,
-                },
-                "&:hover fieldset": {
-                  borderColor: theme.palette.secondary.main,
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: theme.palette.secondary.main,
-                },
-              },
-            }}
-            disabled={!!success}
-          />
-          <TextField
             label="Nowe hasło"
             type="password"
             inputRef={newPasswordRef}
@@ -186,11 +153,9 @@ const ChangePasswordPage = () => {
             onBlur={() => setNewPasswordFocus(false)}
             error={!!newPassword && !validPassword}
             helperText={
-              newPasswordFocus && (
-                !validPassword
-                  ? `Od ${LENGTH_LIMITS.PASSWORD_MIN} do ${LENGTH_LIMITS.PASSWORD_MAX} znaków. Musi zawierać dużą i małą literę, cyfrę i znak specjalny (!@#$%).`
-                  : " "
-              )
+              newPasswordFocus && !validPassword
+                ? `Od ${LENGTH_LIMITS.PASSWORD_MIN} do ${LENGTH_LIMITS.PASSWORD_MAX} znaków. Musi zawierać dużą i małą literę, cyfrę i znak specjalny (!@#$%).`
+                : " "
             }
             required
             fullWidth
@@ -211,7 +176,6 @@ const ChangePasswordPage = () => {
                 },
               },
             }}
-            disabled={!!success}
           />
           <TextField
             label="Powtórz nowe hasło"
@@ -250,14 +214,13 @@ const ChangePasswordPage = () => {
                 },
               },
             }}
-            disabled={!!success}
           />
           {error && <Alert severity="error">{error}</Alert>}
           <Button
             type="submit"
             variant="contained"
             color="primary"
-            disabled={!canSubmit || !!success}
+            disabled={!canSubmit}
             sx={{
               borderRadius: 2,
               fontWeight: 600,
@@ -271,12 +234,13 @@ const ChangePasswordPage = () => {
             }}
             fullWidth
           >
-            {loading ? <CircularProgress size={24} /> : "Zmień hasło"}
+            {loading ? <CircularProgress size={24} /> : "Ustaw nowe hasło"}
           </Button>
         </Box>
+        )}
       </Paper>
     </Box>
   );
 };
 
-export default ChangePasswordPage;
+export default SetPasswordPage;
