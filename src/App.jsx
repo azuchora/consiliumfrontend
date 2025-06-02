@@ -13,6 +13,7 @@ import BrowsePostsPage from './pages/BrowsePostsPage';
 import "./App.css";
 import PostPage from './pages/PostPage';
 import UserProfilePage from './pages/UserProfilePage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
 
           <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
             <Route path='verify' element={<VerifyPage />} />
+            <Route path='change-password' element={<ChangePasswordPage />} />
           </Route>
 
           <Route element={<RequireAuth allowedRoles={[ROLES.Verified]} />}>

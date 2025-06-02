@@ -182,7 +182,7 @@ const NotificationBell = ({ mobile = false }) => {
               const avatarUrl = getAvatarUrl(n);
               const initial =
                 n.metadata?.username?.[0]?.toUpperCase() || "?";
-              if (n.type === "new_message") return null;
+              
               return (
                 <ListItem
                   key={n.id}
@@ -280,7 +280,6 @@ const NotificationBell = ({ mobile = false }) => {
             p: 0,
             borderRadius: 2,
             boxShadow: 4,
-            overflow: "hidden",
           },
         }}
         disableScrollLock

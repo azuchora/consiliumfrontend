@@ -3,7 +3,7 @@ import useAxiosPrivate from "./useAxiosPrivate";
 import useSocket from "./useSocket";
 import useAuth from "./useAuth";
 
-const NOTIFICATIONS_LIMIT = 10;
+const NOTIFICATIONS_LIMIT = 15;
 
 const useNotifications = () => {
   const axiosPrivate = useAxiosPrivate();
@@ -43,25 +43,21 @@ const useNotifications = () => {
         const newNotifications = res.data.notifications || [];
         const pagination = res.data.pagination || {};
 
-        setNotifications((prev) => {
-          if (reset) {
-            const merged = mergeNotifications(newNotifications, prev);
-            if (merged.length === prev.length) {
-              setHasMore(false);
-            } else {
-              setHasMore(!!pagination.hasMore && newNotifications.length > 0);
-            }
-            return merged;
-          }
-          const existingIds = new Set(prev.map((n) => n.id));
+        let merged;
+        if (reset) {
+          merged = mergeNotifications(newNotifications, notifications);
+        } else {
+          const existingIds = new Set(notifications.map((n) => n.id));
           const uniqueNew = newNotifications.filter((n) => !existingIds.has(n.id));
-          if (uniqueNew.length === 0) {
-            setHasMore(false);
-          } else {
-            setHasMore(!!pagination.hasMore && newNotifications.length > 0);
-          }
-          return [...prev, ...uniqueNew];
-        });
+          merged = mergeNotifications([...notifications, ...uniqueNew], []);
+        }
+        setNotifications(merged);
+
+        if (newNotifications.length === 0) {
+          setHasMore(false);
+        } else {
+          setHasMore(!!pagination.hasMore && newNotifications.length > 0);
+        }
 
         setBefore(pagination.timestamp || null);
 
@@ -128,6 +124,8 @@ const useNotifications = () => {
     }
   }, [notifications, axiosPrivate]);
 
+  const chatUnreadCount = notifications.filter(n => n.type === "new_message" && !n.read).length;
+
   return {
     notifications,
     unreadCount,
@@ -136,6 +134,7 @@ const useNotifications = () => {
     fetchNotifications,
     markAllAsRead,
     before,
+    chatUnreadCount,
   };
 };
 

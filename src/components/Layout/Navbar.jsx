@@ -22,10 +22,12 @@ import {
   Box,
   Divider,
   useMediaQuery,
+  Badge,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import NotificationBell from '../notifications/NotificationBell';
 import ChatMenu from '../chat/ChatMenu';
+import useNotifications from '../../hooks/useNotifications';
 
 const Navbar = () => {
   const { isAuthed, username, avatar, isVerified } = useAuth();
@@ -37,6 +39,8 @@ const Navbar = () => {
   const [chatOpen, setChatOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  const { chatUnreadCount } = useNotifications();
 
   const handleLogout = async () => {
     await logout();
@@ -112,7 +116,9 @@ const Navbar = () => {
                   aria-label="Czaty"
                   sx={{ ml: 1 }}
                 >
-                  <FontAwesomeIcon icon={faComments} />
+                  <Badge badgeContent={chatUnreadCount} color="error">
+                    <FontAwesomeIcon icon={faComments} />
+                  </Badge>
                 </IconButton>
                 <ChatMenu open={chatOpen} onClose={() => setChatOpen(false)} mobile={isMobile} />
               </>
@@ -196,6 +202,9 @@ const Navbar = () => {
                         Weryfikacja
                       </MenuItem>
                     )}
+                    <MenuItem onClick={() => { navigate('/change-password'); handleMenuClose(); }}>
+                      Zmień hasło
+                    </MenuItem>
                     <MenuItem onClick={handleLogout}>Wyloguj</MenuItem>
                   </Menu>
                 </>
@@ -227,12 +236,6 @@ const Navbar = () => {
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', p: 2, pb: 0, mt: 4 }}>
-          {/* <Typography variant="h6" sx={{ flexGrow: 1, color: '#fff', fontWeight: 700 }}>
-            Consilium
-          </Typography>
-          <IconButton onClick={handleDrawerToggle} sx={{ color: '#fff' }}>
-            <FontAwesomeIcon icon={faTimes} />
-          </IconButton> */}
         </Box>
         <Divider sx={{ bgcolor: 'rgba(255,255,255,0.2)', my: 1 }} />
         <List>
@@ -318,6 +321,15 @@ const Navbar = () => {
                   <ListItemText primary="Weryfikacja" />
                 </ListItem>
               )}
+                <ListItem
+                  button
+                  onClick={() => {
+                    navigate('/change-password');
+                    handleDrawerToggle();
+                  }}
+                >
+                  <ListItemText primary="Zmień hasło" />
+                </ListItem>
               <ListItem
                 onClick={handleLogout}
                 sx={{
