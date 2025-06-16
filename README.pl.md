@@ -15,7 +15,8 @@ Aplikacja służy jako **zamknięte forum dyskusyjne dla lekarzy**, które wspie
 - **React.js** – główny framework do budowy interfejsu użytkownika  
 - **React Router** – obsługa wielu widoków w aplikacji SPA  
 - **Axios** – komunikacja z REST API backendu   
-- **Context API** – globalny stan aplikacji (autoryzacja, użytkownik)  
+- **Context API** – globalny stan aplikacji (autoryzacja, użytkownik)
+- **Material UI** - biblioteka komponentów UI  
 
 ## ✨ Główne funkcje (frontend)
 
@@ -25,6 +26,7 @@ Aplikacja służy jako **zamknięte forum dyskusyjne dla lekarzy**, które wspie
 - Responsywny interfejs dostosowany do różnych urządzeń
 - Prywatne dyskusje między lekarzami (prywatne chaty)
 - Obsługa sesji użytkownika i autoryzacji tokenem
+- Powiadomienia w czasie rzeczywistym
 
 ## 🚀 Jak uruchomić frontend lokalnie
 
@@ -39,19 +41,25 @@ git clone https://github.com/azuchora/consiliumfrontend.git
 cd consiliumfrontend
 ```
 
-2. Zainstaluj zależności projektu:
+2. Utwórz plik .env w katalogu głównym:
+
+```bash
+BASE_URL=http://localhost:3300
+```
+
+3. Zainstaluj zależności projektu:
 
 ```bash
 npm install
 ```
 
-3. Uruchom aplikacje w trybie deweloperskim:
+4. Uruchom aplikacje w trybie deweloperskim:
 
 ```bash
 npm start
 ```
 
-4. Otwórz przeglądarke i wejdź pod adres:
+5. Otwórz przeglądarke i wejdź pod adres:
 
 ```bash
 http://localhost:3000

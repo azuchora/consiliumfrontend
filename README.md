@@ -16,6 +16,7 @@ The application serves as a **closed discussion forum** for doctors, supporting 
 - **React Router** – handling multiple views in a SPA
 - **Axios** – ommunication with the backend REST API 
 - **Context API** – global application state (authorization, user)
+- **Material UI** – component library
 
 ## ✨ Main features (frontend)
 
@@ -25,6 +26,7 @@ The application serves as a **closed discussion forum** for doctors, supporting 
 - Responsive interface adapted to various devices
 - Private discussions between doctors
 - Session management and token-based authorization
+- Real-time notifications
 
 ## 🚀 How to run the frontend locally
 
@@ -39,19 +41,25 @@ git clone https://github.com/azuchora/consiliumfrontend.git
 cd consiliumfrontend
 ```
 
-2. Install project dependencies:
+2. Create .env file in the root directory:
+
+```bash
+BASE_URL=http://localhost:3300
+```
+
+3. Install project dependencies:
 
 ```bash
 npm install
 ```
 
-3. Run the application in development mode:
+4. Run the application in development mode:
 
 ```bash
 npm start
 ```
 
-4. Open your browser and go to:
+5. Open your browser and go to:
 
 ```bash
 http://localhost:3000
