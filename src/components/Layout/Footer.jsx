@@ -18,7 +18,7 @@ const Footer = () => {
       <Typography variant="body2" sx={{ mb: 1, px: 1 }}>
         &copy; 2025 CONSILIUM. Wszelkie prawa zastrzeżone.
       </Typography>
-      <Box
+      {/* <Box
         sx={{
           display: 'flex',
           flexWrap: 'wrap',
@@ -65,7 +65,7 @@ const Footer = () => {
         >
           Kontakt
         </Link>
-      </Box>
+      </Box> */}
     </Box>
   );
 };

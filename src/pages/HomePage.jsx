@@ -354,9 +354,9 @@ const HomePage = () => {
           }}
         >
           <Typography variant="body2" sx={{ mb: 1, mt: 1 }}>
-            Masz pytania lub chcesz zgłosić sugestię? Skontaktuj się z nami przez formularz kontaktowy lub napisz na adres <b>kontakt@consilium.pl</b>.
+            Masz pytania lub chcesz zgłosić sugestię? Skontaktuj się z nami przez <b>kontakt@consilium.pl</b>.
           </Typography>
-          <Button
+          {/* <Button
             variant="outlined"
             color="primary"
             sx={{
@@ -369,7 +369,7 @@ const HomePage = () => {
             onClick={() => navigate('/contact')}
           >
             Kontakt
-          </Button>
+          </Button> */}
         </Paper>
       </Container>
     </Box>
