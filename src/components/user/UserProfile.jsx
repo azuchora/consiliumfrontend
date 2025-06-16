@@ -35,20 +35,33 @@ import useFollow from "../../hooks/useFollow";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import ChatMenu from "../chat/ChatMenu";
 
-const getRoleNames = (roleIds) => {
-  if (!Array.isArray(roleIds)) return [];
+const getRoleDisplay = (roleIds) => {
+  if (!Array.isArray(roleIds)) return { label: "Nieznany", color: "default", textColor: undefined };
+
   const idToName = Object.entries(ROLES).reduce((acc, [name, id]) => {
     acc[id] = name;
     return acc;
   }, {});
-  return roleIds.map((id) => idToName[id] || id);
+
+  const roles = roleIds.map((id) => idToName[id] || id);
+
+  if (roles.includes("Admin")) {
+    return { label: "Administrator", color: "error", textColor: "#fff" };
+  }
+  if (roles.includes("Verified")) {
+    return { label: "Zweryfikowany", color: "success", textColor: undefined };
+  }
+  if (roles.includes("User")) {
+    return { label: "Niezweryfikowany", color: "warning", textColor: undefined };
+  }
+  return { label: roles.join(", "), color: "default", textColor: undefined };
 };
 
 const UserProfile = () => {
   const { username } = useParams();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const { auth } = useAuth();
+  const { auth, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const { user, loading, fetchUser } = useUser(username);
@@ -67,7 +80,6 @@ const UserProfile = () => {
   
   const { followed, followLoading, handleFollowToggle, setFollowed } = useFollow(user, "user");
 
-  // Chat state
   const axiosPrivate = useAxiosPrivate();
   const [chatOpen, setChatOpen] = useState(false);
   const [initialConversation, setInitialConversation] = useState(null);
@@ -75,7 +87,6 @@ const UserProfile = () => {
   useEffect(() => {
     resetPosts();
     fetchPosts(null, true);
-    // eslint-disable-next-line
   }, [username]);
 
   useEffect(() => {
@@ -92,11 +103,11 @@ const UserProfile = () => {
     fetchPosts(lastTimestamp, false);
   };
 
-  const roleNames = useMemo(() => getRoleNames(user?.roles), [user]);
+  const roleDisplay = useMemo(() => getRoleDisplay(user?.roles), [user]);
 
   const authedUsername = auth?.username;
   const authedId = auth?.id;
-  const canEdit = authedUsername && authedUsername === user?.username;
+  const canEdit = (authedUsername && authedUsername === user?.username) || isAdmin();
   const canFollow = authedUsername && user && authedUsername !== user.username;
   const canChat = authedId && user && authedId !== user.id;
 
@@ -109,14 +120,13 @@ const UserProfile = () => {
     setPosts(prev => prev.filter(p => p.id !== deletedId));
   };
 
-  // Start chat with this user
   const handleStartChat = async () => {
     try {
       const res = await axiosPrivate.post("/conversations", { userId: user.id });
       setInitialConversation(res.data.conversation);
       setChatOpen(true);
     } catch (e) {
-      // Optionally show error
+      
     }
   };
 
@@ -230,69 +240,91 @@ const UserProfile = () => {
                 }}
               />
               <Chip
-                label={`Role: ${roleNames.join(", ")}`}
+                label={roleDisplay.label}
                 size="small"
+                color={roleDisplay.color !== "default" ? roleDisplay.color : undefined}
                 sx={{
-                  bgcolor: theme.palette.info.light,
-                  color: theme.palette.info.dark,
-                  fontWeight: 600,
+                  bgcolor:
+                    roleDisplay.color === "error"
+                      ? theme.palette.error.main
+                      : roleDisplay.color === "success"
+                      ? theme.palette.success.light
+                      : roleDisplay.color === "warning"
+                      ? theme.palette.warning.light
+                      : theme.palette.info.light,
+                  color:
+                    roleDisplay.textColor
+                      ? roleDisplay.textColor
+                      : roleDisplay.color === "error"
+                      ? "#fff"
+                      : roleDisplay.color === "success"
+                      ? theme.palette.success.dark
+                      : roleDisplay.color === "warning"
+                      ? theme.palette.warning.dark
+                      : theme.palette.info.dark,
+                  fontWeight: 700,
+                  border: roleDisplay.color === "error" ? `2px solid ${theme.palette.error.dark}` : undefined,
                 }}
               />
             </Stack>
-            {canEdit && (
-              <Button
-                variant="outlined"
-                startIcon={<EditIcon />}
-                sx={{
-                  borderRadius: 2,
-                  fontWeight: 600,
-                  color: theme.palette.primary.main,
-                  borderColor: theme.palette.primary.main,
-                  "&:hover": {
-                    bgcolor: theme.palette.secondary.main,
-                    color: "#fff",
-                    borderColor: theme.palette.secondary.main,
-                  },
-                  mr: 2,
-                }}
-                onClick={() => setEditOpen(true)}
-              >
-                Edytuj profil
-              </Button>
-            )}
+            <Stack
+              direction={"row"}
+              alignItems="center"
+              justifyContent="flex-start"
+              sx={{ mt: 2, flexWrap: "wrap", gap: 1 }}
+            >
+              {canEdit && (
+                <Button
+                  variant="outlined"
+                  startIcon={<EditIcon />}
+                  sx={{
+                    borderRadius: 2,
+                    fontWeight: 600,
+                    color: theme.palette.primary.main,
+                    borderColor: theme.palette.primary.main,
+                    "&:hover": {
+                      bgcolor: theme.palette.secondary.main,
+                      color: "#fff",
+                      borderColor: theme.palette.secondary.main,
+                    },
+                  }}
+                  onClick={() => setEditOpen(true)}
+                >
+                  Edytuj profil
+                </Button>
+              )}
 
-            {canFollow && (
-              <Button
-                variant={followed ? "contained" : "outlined"}
-                color={followed ? "secondary" : "primary"}
-                sx={{
-                  borderRadius: 2,
-                  fontWeight: 600,
-                  ml: canEdit ? 2 : 0,
-                  minWidth: 120,
-                }}
-                disabled={followLoading}
-                onClick={handleFollowToggle}
-              >
-                {followed ? "Obserwujesz" : "Obserwuj"}
-              </Button>
-            )}
+              {canFollow && (
+                <Button
+                  variant={followed ? "contained" : "outlined"}
+                  color={followed ? "secondary" : "primary"}
+                  sx={{
+                    borderRadius: 2,
+                    fontWeight: 600,
+                    minWidth: 120,
+                  }}
+                  disabled={followLoading}
+                  onClick={handleFollowToggle}
+                >
+                  {followed ? "Obserwujesz" : "Obserwuj"}
+                </Button>
+              )}
 
-            {canChat && (
-              <Button
-                variant="contained"
-                color="primary"
-                sx={{
-                  borderRadius: 2,
-                  fontWeight: 600,
-                  ml: 2,
-                  minWidth: 120,
-                }}
-                onClick={handleStartChat}
-              >
-                Rozpocznij czat
-              </Button>
-            )}
+              {canChat && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    borderRadius: 2,
+                    fontWeight: 600,
+                    minWidth: 120,
+                  }}
+                  onClick={handleStartChat}
+                >
+                  Rozpocznij czat
+                </Button>
+              )}
+            </Stack>
           </Box>
         </Stack>
       </Paper>
@@ -395,7 +427,6 @@ const UserProfile = () => {
         </DialogContent>
       </Dialog>
 
-      {/* ChatMenu for starting conversation */}
       <ChatMenu
         open={chatOpen}
         onClose={() => setChatOpen(false)}

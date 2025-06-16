@@ -69,6 +69,10 @@ const Navbar = () => {
     }
   };
 
+  const handleChatMenuClose = () => {
+    setChatOpen(false);
+  };
+
   return (
     <>
       <AppBar
@@ -120,7 +124,11 @@ const Navbar = () => {
                     <FontAwesomeIcon icon={faComments} />
                   </Badge>
                 </IconButton>
-                <ChatMenu open={chatOpen} onClose={() => setChatOpen(false)} mobile={isMobile} />
+                <ChatMenu
+                  open={chatOpen}
+                  onClose={handleChatMenuClose}
+                  mobile={isMobile}
+                />
               </>
             )}
 

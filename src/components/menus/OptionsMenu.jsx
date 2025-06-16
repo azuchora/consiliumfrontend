@@ -19,7 +19,6 @@ const OptionsMenu = ({
 
   const handleMenuOpen = (e) => setAnchorEl(e.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
-
   return (
     <>
       <IconButton
@@ -57,6 +56,9 @@ const OptionsMenu = ({
             {children}
           </MenuItem>
         )}
+        <MenuItem onClick={handleMenuClose} disabled={loading}>
+          Zamknij
+        </MenuItem>
       </Menu>
       <Dialog
         open={deleteDialogOpen}

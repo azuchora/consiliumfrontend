@@ -17,7 +17,7 @@ import { BACKEND_URL } from "../../api/axios";
 const EditProfile = ({ user, onClose, onUpdated }) => {
   const theme = useTheme();
   const axiosPrivate = useAxiosPrivate();
-  const { setAvatar } = useAuth();
+  const { setAvatar, auth } = useAuth();
 
   const [form, setForm] = useState({
     name: user.name || "",
@@ -47,7 +47,7 @@ const EditProfile = ({ user, onClose, onUpdated }) => {
       setAvatarPreview(URL.createObjectURL(file));
     }
   };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -67,7 +67,7 @@ const EditProfile = ({ user, onClose, onUpdated }) => {
           headers: { "Content-Type": "multipart/form-data" },
         });
 
-        if (res.data && res.data.filename) {
+        if ((res.data && res.data.filename) && auth.id === user.id) {
           setAvatar(res.data.filename);
         }
       }
@@ -133,7 +133,7 @@ const EditProfile = ({ user, onClose, onUpdated }) => {
             Zmień avatar
           </Typography>
         </label>
-        <TextField
+        {/* <TextField
           name="name"
           label="Imię"
           value={form.name}
@@ -148,7 +148,7 @@ const EditProfile = ({ user, onClose, onUpdated }) => {
           onChange={handleChange}
           fullWidth
           variant="outlined"
-        />
+        /> */}
         {error && <Alert severity="error">{error}</Alert>}
         {success && <Alert severity="success">{success}</Alert>}
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mt: 1, width: "100%", justifyContent: "center" }}>

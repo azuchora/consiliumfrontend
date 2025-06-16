@@ -12,6 +12,7 @@ import { useTheme } from "@mui/material/styles";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useLogout from "../hooks/useLogout";
 import { LENGTH_LIMITS, PASSWORD_REGEX_STR } from '../constants/validation';
+import { useNavigate } from "react-router-dom";
 
 const PASSWORD_REGEX = new RegExp(PASSWORD_REGEX_STR);
 
@@ -19,6 +20,7 @@ const ChangePasswordPage = () => {
   const theme = useTheme();
   const axiosPrivate = useAxiosPrivate();
   const logout = useLogout();
+  const navigate = useNavigate();
 
   const oldPasswordRef = useRef();
   const newPasswordRef = useRef();
@@ -272,6 +274,21 @@ const ChangePasswordPage = () => {
             fullWidth
           >
             {loading ? <CircularProgress size={24} /> : "Zmień hasło"}
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => navigate(-1)}
+            sx={{
+              mt: 1,
+              fontWeight: 600,
+              borderRadius: 2,
+              textTransform: "none",
+              px: 2,
+            }}
+            fullWidth
+          >
+            Powrót
           </Button>
         </Box>
       </Paper>

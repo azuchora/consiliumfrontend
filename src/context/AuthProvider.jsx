@@ -12,9 +12,10 @@ export const AuthProvider = ({ children }) => {
 
   const isAuthed = () => auth?.accessToken ? true : false;
   const isVerified = () => auth?.roles.includes(ROLES.Verified);
+  const isAdmin = () => auth?.roles.includes(ROLES.Admin);
   
   return (
-    <AuthContext.Provider value={{ auth, setAuth, persist, setPersist, isAuthed, setAvatar, setUsername, avatar, username, isVerified }}>
+    <AuthContext.Provider value={{ auth, setAuth, persist, setPersist, isAuthed, setAvatar, setUsername, avatar, username, isVerified, isAdmin }}>
       {children}
     </AuthContext.Provider>
   )

@@ -22,7 +22,7 @@ const useVoting = ({ initialVote, initialCount, onVote }) => {
       setVote(newVote);
       setVoteCount(newVoteCount);
     } catch (err) {
-      // Optionally handle error
+      
     } finally {
       setLoading(false);
     }

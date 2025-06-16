@@ -33,7 +33,7 @@ const genderMap = {
 };
 
 const PostPreview = ({ post, isPage = false, onDelete }) => {
-  const { auth } = useAuth();
+  const { auth, isAdmin } = useAuth();
   const currentUserId = auth?.id;
 
   const totalVotes = post.post_votes?.reduce((sum, v) => sum + v.value, 0) || 0;
@@ -126,7 +126,7 @@ const PostPreview = ({ post, isPage = false, onDelete }) => {
           }}
         >
           <OptionsMenu
-            isOwner={isOwnPost}
+            isOwner={isOwnPost || isAdmin()}
             loading={deleteLoading}
             deleteDialogOpen={deleteDialogOpen}
             setDeleteDialogOpen={setDeleteDialogOpen}

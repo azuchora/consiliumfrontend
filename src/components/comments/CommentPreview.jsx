@@ -38,7 +38,7 @@ const CommentPreview = ({ comment, onDelete }) => {
   const formatDate = useFormatDate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const { auth } = useAuth();
+  const { auth, isAdmin } = useAuth();
   const currentUserId = auth?.id;
 
   const initialTotalVotes = comment.comment_votes?.reduce((sum, v) => sum + v.value, 0) || 0;
@@ -92,11 +92,13 @@ const CommentPreview = ({ comment, onDelete }) => {
     try {
       await axiosPrivate.put(`/comments/${comment.id}/helpful`, { isHelpful: !isHelpful });
       setIsHelpful((prev) => !prev);
+    } catch (error) {
+      console.error("Error marking comment as helpful:", error);
     } finally {
       setLoadingHelpful(false);
     }
   };
-
+  
   return (
     <Paper
       elevation={1}
@@ -126,7 +128,7 @@ const CommentPreview = ({ comment, onDelete }) => {
         }}
       >
         <OptionsMenu
-          isOwner={isOwnComment}
+          isOwner={isOwnComment || isAdmin()}
           loading={deleteLoading}
           deleteDialogOpen={deleteDialogOpen}
           setDeleteDialogOpen={setDeleteDialogOpen}
@@ -168,26 +170,27 @@ const CommentPreview = ({ comment, onDelete }) => {
             mt: isMobile ? 1 : 0,
           }}
         >
-          <Tooltip title="Oznaczony jako pomocny">
-            <span style={{ display: "flex", alignItems: "center" }}>
-              {isHelpful && (
-                <FontAwesomeIcon icon={faStarSolid} style={{ color: theme.palette.warning.main, fontSize: 22 }} />
-              )}
-              {isPostOwner && (
-                <IconButton
-                  size="small"
-                  onClick={handleHelpful}
-                  disabled={loadingHelpful}
-                  sx={{
-                    color: isHelpful ? theme.palette.warning.main : theme.palette.action.active,
-                    ml: 1,
-                  }}
-                >
-                  <FontAwesomeIcon icon={faStarSolid} />
-                </IconButton>
-              )}
-            </span>
-          </Tooltip>
+          { isPostOwner ? (
+            <Tooltip title={ isHelpful ? "Oznaczono jako pomocny" : "Oznacz jako pomocny" }>
+              <IconButton
+                size="small"
+                onClick={handleHelpful}
+                disabled={loadingHelpful}
+                sx={{
+                  color: isHelpful ? theme.palette.warning.main : theme.palette.action.active,
+                  fontSize: 22,
+                }}
+              >
+                <FontAwesomeIcon icon={faStarSolid} />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            isHelpful && (
+              <Tooltip title="Komentarz oznaczony jako pomocny">
+                <FontAwesomeIcon icon={faStarSolid} fontSize={22} color={theme.palette.warning.main}/>
+              </Tooltip>
+            )
+          )}
         </Box>
       </Stack>
       <Typography variant="body1" sx={{ mb: 1, wordBreak: "break-word", color: theme.palette.text.primary }}>

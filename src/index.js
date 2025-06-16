@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { SocketProvider } from './context/SocketProvider';
 import { ThemeProvider } from '@emotion/react';
 import Theme from './context/Theme';
+import { NotificationsProvider } from './context/NotificationsProvider';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -14,9 +15,11 @@ root.render(
     <ThemeProvider theme={Theme}>
       <AuthProvider>
         <SocketProvider>
-          <Routes>
-            <Route path='/*' element={<App/>}/>
-          </Routes>
+          <NotificationsProvider>
+            <Routes>
+              <Route path='/*' element={<App/>}/>
+            </Routes>
+          </NotificationsProvider>
         </SocketProvider>
       </AuthProvider>
     </ThemeProvider>

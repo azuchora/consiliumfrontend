@@ -45,20 +45,22 @@ const getNotificationMessage = (notification, onUsernameClick) => {
   );
 
   const isPostFollower = metadata?.isFollower;
-  
+
   switch (type) {
     case "new_comment":
       return isPostFollower ? (
         <>{usernameNode} skomentował(a) obserwowany post</>
       ) : (
         <>{usernameNode} skomentował(a) Twój post</>
-      )
+      );
     case "comment_reply":
       return <>{usernameNode} odpowiedział(a) na Twój komentarz</>;
     case "new_post":
       return <>{usernameNode} dodał(a) nowy post</>;
     case "post_voted":
       return <>{usernameNode} zagłosował(a) na Twój post</>;
+    case "new_message":
+      return <>{usernameNode} napisał(a) nową wiadomość</>;
     default:
       return <>Nowa aktywność od {usernameNode}</>;
   }
@@ -80,6 +82,8 @@ const getNotificationUrl = (notification) => {
       return `/posts/${metadata.postId}`;
     case "post_voted":
       return `/posts/${metadata.postId}`;
+    case "new_message":
+      return '/';
     default:
       return "/";
   }
@@ -111,7 +115,6 @@ const NotificationBell = ({ mobile = false }) => {
     if (isAuthed()) {
       fetchNotifications(null, true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthed]);
 
   const handleOpen = (event) => {
@@ -223,11 +226,7 @@ const NotificationBell = ({ mobile = false }) => {
                   </ListItemAvatar>
                   <ListItemText
                     primary={getNotificationMessage(n, handleUsernameClick)}
-                    secondary={
-                      n.createdAt
-                        ? formatDate(n.createdAt)
-                        : ""
-                    }
+                    secondary={n.createdAt ? formatDate(n.createdAt) : ""}
                     primaryTypographyProps={{
                       fontWeight: n.read ? 400 : 600,
                       color: n.read ? "#333" : "#1976d2",

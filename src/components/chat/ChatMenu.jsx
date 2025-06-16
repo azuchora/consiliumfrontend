@@ -23,8 +23,9 @@ import useAuth from "../../hooks/useAuth";
 import useConversations from "../../hooks/useConversations";
 import useMessages from "../../hooks/useMessages";
 import { BACKEND_URL } from "../../api/axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import useNotifications from "../../hooks/useNotifications";
 
 const ChatMenu = ({ open, onClose, mobile }) => {
   const theme = useTheme();
@@ -59,9 +60,18 @@ const ChatMenu = ({ open, onClose, mobile }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedMsgId, setSelectedMsgId] = useState(null);
 
+  const { markChatNotificationsAsRead, getChatNotificationsForConversation, notifications } = useNotifications();
+
+  const prevNotificationsRef = useRef(notifications);
+
   useEffect(() => {
-    if (open && auth?.id) fetchConversations();
-  }, [open, fetchConversations, auth?.id]);
+    if (open && auth?.id) {
+      fetchConversations();
+      if (selectedConv) {
+        markChatNotificationsAsRead(selectedConv.id);
+      }
+    }
+  }, [open, fetchConversations, auth?.id, selectedConv, markChatNotificationsAsRead]);
 
   useEffect(() => {
     if (selectedConv && auth?.id) {
@@ -71,6 +81,31 @@ const ChatMenu = ({ open, onClose, mobile }) => {
       setMessages([]);
     }
   }, [selectedConv, fetchMessages, setMessages, setHasMore, auth?.id]);
+
+  useEffect(() => {
+    if (!selectedConv) return;
+    const prev = prevNotificationsRef.current;
+    const current = notifications;
+    const prevChatNotifs = prev.filter(
+      (n) =>
+        n.type === "new_message" &&
+        n.metadata.conversationId === selectedConv.id &&
+        !n.read
+    );
+    const currentChatNotifs = current.filter(
+      (n) =>
+        n.type === "new_message" &&
+        n.metadata.conversationId === selectedConv.id &&
+        !n.read
+    );
+    if (
+      currentChatNotifs.length > prevChatNotifs.length ||
+      (currentChatNotifs.length > 0 && prevChatNotifs.length === 0)
+    ) {
+      markChatNotificationsAsRead(selectedConv.id);
+    }
+    prevNotificationsRef.current = notifications;
+  }, [notifications, selectedConv, markChatNotificationsAsRead]);
 
   const handleMenuOpen = (event, msgId) => {
     setAnchorEl(event.currentTarget);
@@ -91,6 +126,11 @@ const ChatMenu = ({ open, onClose, mobile }) => {
     } catch {}
   };
 
+  const handleClose = () => {
+    setSelectedConv(null);
+    if (onClose) onClose();
+  };
+
   if (!auth?.id) {
     return (
       <Box sx={{ p: 4, textAlign: "center" }}>
@@ -108,6 +148,8 @@ const ChatMenu = ({ open, onClose, mobile }) => {
 
     const lastMessage = conv.messages?.[0]?.content || "";
 
+    const unread = getChatNotificationsForConversation(conv.id).length;
+
     return {
       id: conv?.id,
       avatar: otherUser?.files?.[0]?.filename
@@ -119,10 +161,10 @@ const ChatMenu = ({ open, onClose, mobile }) => {
         otherUser?.username ||
         `Użytkownik #${otherId}`,
       subtitle: lastMessage,
-      dateString: conv.lastMessageAt ? 
-        formatDistanceToNow(new Date(conv.lastMessageAt), { locale: pl, addSuffix: true })
+      dateString: conv.lastMessageAt
+        ? formatDistanceToNow(new Date(conv.lastMessageAt), { locale: pl, addSuffix: true })
         : null,
-      unread: false,
+      unread: unread > 0,
     };
   });
 
@@ -153,6 +195,7 @@ const ChatMenu = ({ open, onClose, mobile }) => {
     status: msg.read ? "read" : "waiting",
     date: new Date(msg.createdAt),
     dateString: formatDistanceToNow(new Date(msg.createdAt), { locale: pl, addSuffix: true }),
+    id: msg.id,
   }));
 
   const chatContent = (
@@ -223,7 +266,7 @@ const ChatMenu = ({ open, onClose, mobile }) => {
           <IconButton
             edge="end"
             color="inherit"
-            onClick={onClose}
+            onClick={handleClose}
             sx={{
               ml: 1,
               display: "flex",
@@ -274,6 +317,7 @@ const ChatMenu = ({ open, onClose, mobile }) => {
               toBottomHeight={"100%"}
               dataSource={messageListItems}
               style={{ width: "100%", maxWidth: "100vw", overflowX: "hidden" }}
+              key="message-list"
             />
             <div ref={messagesEndRef} />
           </InfiniteScroll>
@@ -312,9 +356,13 @@ const ChatMenu = ({ open, onClose, mobile }) => {
               dataSource={chatListItems}
               onClick={(item) => {
                 const conv = conversations.find((c) => c.id === item.id);
-                if (conv) selectConversation(conv);
+                if (conv) {
+                  selectConversation(conv);
+                  markChatNotificationsAsRead(conv.id);
+                }
               }}
               style={{ width: "100%", maxWidth: "100vw", overflowX: "hidden" }}
+              key="chat-list"
             />
           )}
         </Box>
@@ -357,10 +405,10 @@ const ChatMenu = ({ open, onClose, mobile }) => {
 
   if (mobile) {
     return (
-      <Dialog 
-        open={open} 
-        onClose={onClose} 
-        fullScreen 
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        fullScreen
         PaperProps={{ sx: { zIndex: 2000 } }}
         TransitionComponent={Slide}
         TransitionProps={{ direction: "up" }}
@@ -374,7 +422,7 @@ const ChatMenu = ({ open, onClose, mobile }) => {
     <Drawer
       anchor="right"
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       disableScrollLock
       PaperProps={{
         sx: { width: 400, maxWidth: "100vw", p: 0, bgcolor: "#fff" },
