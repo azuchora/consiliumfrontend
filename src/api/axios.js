@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3300';
+export const BACKEND_URL = process.env.BACKEND_URL;
 export const BASE_URL = `${BACKEND_URL}/api/v1`
 
 export default axios.create({
